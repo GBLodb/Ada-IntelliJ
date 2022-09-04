@@ -1,6 +1,7 @@
 package com.adacore.adaintellij.notifications;
 
-import com.intellij.notification.*;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
 import org.jetbrains.annotations.NotNull;
 
 /**

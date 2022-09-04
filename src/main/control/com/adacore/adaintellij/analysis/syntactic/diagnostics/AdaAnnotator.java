@@ -1,19 +1,23 @@
 package com.adacore.adaintellij.analysis.syntactic.diagnostics;
 
-import java.util.List;
-
-import com.intellij.lang.annotation.*;
-import com.intellij.openapi.editor.*;
+import com.adacore.adaintellij.Utils;
+import com.adacore.adaintellij.lsp.AdaLSPClient;
+import com.adacore.adaintellij.lsp.LSPUtils;
+import com.adacore.adaintellij.misc.cache.CacheResult;
+import com.adacore.adaintellij.misc.cache.Cacher;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
-import org.jetbrains.annotations.*;
-
-import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Range;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.lsp.*;
-import com.adacore.adaintellij.misc.cache.*;
-import com.adacore.adaintellij.Utils;
+import java.util.List;
 
 import static com.adacore.adaintellij.lsp.LSPUtils.diagnosticSeverityToHighlightSeverity;
 

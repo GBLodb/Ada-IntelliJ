@@ -1,20 +1,20 @@
 package com.adacore.adaintellij.analysis.syntactic;
 
+import com.adacore.adaintellij.AdaLanguage;
+import com.adacore.adaintellij.analysis.lexical.AdaTokenTypes;
+import com.adacore.adaintellij.misc.cache.Markable;
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.FileContentUtilCore;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.analysis.lexical.AdaTokenTypes;
-import com.adacore.adaintellij.misc.cache.Markable;
-import com.adacore.adaintellij.AdaLanguage;
 
 /**
  * Representation of an Ada file, acting as the root node in the AST
  * structure used by the IntelliJ platform.
- *
+ * <p>
  * For detailed information about the structure of ASTs built by the
  * Ada-IntelliJ Ada parser:
  * @see AdaParser
@@ -24,7 +24,7 @@ public final class AdaPsiFile extends PsiFileBase implements Markable {
 	/**
 	 * The file view provider corresponding to this Ada file.
 	 */
-	private FileViewProvider viewProvider;
+	private final FileViewProvider viewProvider;
 
 	/**
 	 * Constructs a new AdaPsiFile given a file view provider.

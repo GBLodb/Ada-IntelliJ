@@ -1,8 +1,9 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import java.util.regex.Pattern;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import org.jetbrains.annotations.*;
+import java.util.regex.Pattern;
 
 /**
  * Regex matching a single character from a specific "General Category",

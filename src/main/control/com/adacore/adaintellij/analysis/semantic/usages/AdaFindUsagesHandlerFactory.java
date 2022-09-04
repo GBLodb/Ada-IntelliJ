@@ -11,11 +11,11 @@ import org.jetbrains.annotations.NotNull;
 public final class AdaFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
 
 	/**
-	 * Returns whether or not the given element is a valid element to
+	 * Returns whether the given element is a valid element to
 	 * find usages for.
 	 *
 	 * @param element The element to test.
-	 * @return Whether or not the given element is a valid element to
+	 * @return Whether the given element is a valid element to
 	 *         find usages for.
 	 */
 	@Override
@@ -28,7 +28,7 @@ public final class AdaFindUsagesHandlerFactory extends FindUsagesHandlerFactory 
 	 *
 	 * @param element The element with which to construct a find-usages
 	 *                handler.
-	 * @param forHighlightUsages Whether or not the returned handler is
+	 * @param forHighlightUsages Whether the returned handler is
 	 *                           for highlighting usages.
 	 * @return a find-usages handler for Ada.
 	 */

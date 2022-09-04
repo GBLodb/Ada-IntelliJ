@@ -1,8 +1,11 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import org.jetbrains.annotations.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Regex matching the concatenation of two subregexes.
@@ -48,7 +51,7 @@ public final class ConcatenationRegex extends LexerRegex {
 	 * Returns a new hierarchy of concatenation regexes representing
 	 * the concatenation of a list of regexes, in the same order as they
 	 * appear in the list:
-	 *
+	 * <p>
 	 *            concat_regex
 	 *              /      \
 	 *          regex_1  concat_regex
@@ -61,7 +64,7 @@ public final class ConcatenationRegex extends LexerRegex {
 	 *                         regex_n-2  concat_regex
 	 *                                      /      \
 	 *                                regex_n-1  regex_n
-	 *
+	 * <p>
 	 * The priority of the returned root regex is set to that of the
 	 * regex in the given list with the highest priority.
 	 *

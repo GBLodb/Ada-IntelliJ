@@ -1,17 +1,15 @@
 package com.adacore.adaintellij.misc;
 
-import com.adacore.adaintellij.lsp.AdaLSPDriver;
-import com.adacore.adaintellij.lsp.AdaLSPServer;
+import com.adacore.adaintellij.lsp.AdaLSPDriverService;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.ui.update.MergingUpdateQueue;
 import org.eclipse.lsp4j.FoldingRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,12 +20,12 @@ public class AdaFoldingBuilder extends FoldingBuilderEx implements DumbAware {
 
     @NotNull
     @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
+    public FoldingDescriptor @NotNull [] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
 
         Project project = root.getProject();
         PsiFile psiFile = root.getContainingFile();
 
-        List<FoldingRange> foldingRanges = AdaLSPDriver.getServer(project)
+        List<FoldingRange> foldingRanges = Objects.requireNonNull(AdaLSPDriverService.getServer(project))
             .foldingRange(
                 psiFile.getVirtualFile().getUrl()
             );

@@ -1,12 +1,12 @@
 package com.adacore.adaintellij.analysis.lexical;
 
-import java.util.*;
-
+import com.adacore.adaintellij.analysis.lexical.regex.*;
 import com.intellij.lexer.LexerBase;
 import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.analysis.lexical.regex.*;
+import java.util.*;
 
 /**
  * Base lexical analyser for Ada and related languages.
@@ -20,6 +20,28 @@ abstract class Lexer extends LexerBase {
 	// Whitespaces
 
 	/**
+	 * Regexes matching characters based on their "General Category"
+	 * as defined by the Unicode standard.
+	 */
+	protected static final LexerRegex LETTER_UPPERCASE_REGEX       = new GeneralCategoryRegex("Lu");
+	protected static final LexerRegex LETTER_LOWERCASE_REGEX       = new GeneralCategoryRegex("Ll");
+	protected static final LexerRegex LETTER_TITLECASE_REGEX       = new GeneralCategoryRegex("Lt");
+	protected static final LexerRegex LETTER_MODIFIER_REGEX        = new GeneralCategoryRegex("Lm");
+	protected static final LexerRegex LETTER_OTHER_REGEX           = new GeneralCategoryRegex("Lo");
+	protected static final LexerRegex MARK_NON_SPACING_REGEX       = new GeneralCategoryRegex("Mn");
+	protected static final LexerRegex MARK_SPACING_COMBINING_REGEX = new GeneralCategoryRegex("Mc");
+	protected static final LexerRegex NUMBER_DECIMAL_REGEX         = new GeneralCategoryRegex("Nd");
+	protected static final LexerRegex NUMBER_LETTER_REGEX          = new GeneralCategoryRegex("Nl");
+
+	// Character Categories
+	protected static final LexerRegex PUNCTUATION_CONNECTOR_REGEX  = new GeneralCategoryRegex("Pc");
+	protected static final LexerRegex OTHER_FORMAT_REGEX           = new GeneralCategoryRegex("Cf"); // Currently not used
+	protected static final LexerRegex SEPARATOR_SPACE_REGEX        = new GeneralCategoryRegex("Zs"); // Currently not used
+	protected static final LexerRegex SEPARATOR_LINE_REGEX         = new GeneralCategoryRegex("Zl");
+	protected static final LexerRegex SEPARATOR_PARAGRAPH_REGEX    = new GeneralCategoryRegex("Zp");
+	protected static final LexerRegex OTHER_PRIVATE_USE_REGEX      = new GeneralCategoryRegex("Co");
+	protected static final LexerRegex OTHER_SURROGATE_REGEX        = new GeneralCategoryRegex("Cs");
+	/**
 	 * Regexes matching different whitespace characters.
 	 */
 	private static final LexerRegex HORIZONTAL_TABULATION_REGEX = new UnitRegex("\t");
@@ -29,8 +51,73 @@ abstract class Lexer extends LexerBase {
 	private static final LexerRegex CARRIAGE_RETURN_REGEX       = new UnitRegex("\r");
 	private static final LexerRegex SPACE_REGEX                 = new UnitRegex("\u0020");
 	private static final LexerRegex NEXT_LINE_REGEX             = new UnitRegex("\u0085");
-	private static final LexerRegex NO_BREAK_SPACE_REGEX        = new UnitRegex("\u00a0");
+	/**
+	 * Regexes matching various character classes defined by
+	 * the Ada 2012 specification.
+	 */
+	protected static final LexerRegex FORMAT_EFFECTOR_REGEX =
+		UnionRegex.fromRegexes(
+			HORIZONTAL_TABULATION_REGEX,
+			LINE_FEED_REGEX,
+			VERTICAL_TABULATION_REGEX,
+			FORM_FEED_REGEX,
+			CARRIAGE_RETURN_REGEX,
+			NEXT_LINE_REGEX,
+			SEPARATOR_LINE_REGEX,
+			SEPARATOR_PARAGRAPH_REGEX
+		);
+	protected static final LexerRegex OTHER_CONTROL_REGEX =
+		new IntersectionRegex(
+			new GeneralCategoryRegex("Cc"),
+			new NotRegex(FORMAT_EFFECTOR_REGEX)
+		);
+	protected static final LexerRegex GRAPHIC_CHARACTER_REGEX =
+		new NotRegex(
+			UnionRegex.fromRegexes(
+				OTHER_CONTROL_REGEX,
+				OTHER_PRIVATE_USE_REGEX,
+				OTHER_SURROGATE_REGEX,
+				FORMAT_EFFECTOR_REGEX,
+				new UnitRegex("\ufffe"),
+				new UnitRegex("\uffff")
+			)
+		);
+	/**
+	 * Regex defining a non-quotation-mark graphic character (used
+	 * to define string literals).
+	 * <p>
+	 * A non-quotation-mark graphic character is defined as any
+	 * graphic_character other than the quotation mark character '"'
+	 */
+	private static final LexerRegex NON_QUOTATION_MARK_GRAPHIC_CHARACTER_REGEX =
+		new IntersectionRegex(
+			GRAPHIC_CHARACTER_REGEX,
+			new NotRegex(new UnitRegex("\""))
+		);
+	/**
+	 * Regex defining a string element (used to define string literals).
+	 * <p>
+	 * string_element ::= "" | non_quotation_mark_graphic_character
+	 */
+	private static final LexerRegex STRING_ELEMENT_REGEX =
+		new UnionRegex(
+			new UnitRegex("\"\""),
+			NON_QUOTATION_MARK_GRAPHIC_CHARACTER_REGEX
+		);
 
+	// Identifiers
+	/**
+	 * Regex defining an Ada string literal.
+	 * <p>
+	 * string_literal ::= "{string_element}"
+	 */
+	protected static final LexerRegex STRING_LITERAL_REGEX =
+		ConcatenationRegex.fromRegexes(
+			new UnitRegex("\""),
+			new ZeroOrMoreRegex(STRING_ELEMENT_REGEX),
+			new UnitRegex("\"")
+		);
+	private static final LexerRegex NO_BREAK_SPACE_REGEX        = new UnitRegex("\u00a0");
 	/**
 	 * Regex defining a sequence of whitespaces in Ada.
 	 */
@@ -48,68 +135,10 @@ abstract class Lexer extends LexerBase {
 			)
 		);
 
-	// Character Categories
-
-	/**
-	 * Regexes matching characters based on their "General Category"
-	 * as defined by the Unicode standard.
-	 */
-	protected static final LexerRegex LETTER_UPPERCASE_REGEX       = new GeneralCategoryRegex("Lu");
-	protected static final LexerRegex LETTER_LOWERCASE_REGEX       = new GeneralCategoryRegex("Ll");
-	protected static final LexerRegex LETTER_TITLECASE_REGEX       = new GeneralCategoryRegex("Lt");
-	protected static final LexerRegex LETTER_MODIFIER_REGEX        = new GeneralCategoryRegex("Lm");
-	protected static final LexerRegex LETTER_OTHER_REGEX           = new GeneralCategoryRegex("Lo");
-	protected static final LexerRegex MARK_NON_SPACING_REGEX       = new GeneralCategoryRegex("Mn");
-	protected static final LexerRegex MARK_SPACING_COMBINING_REGEX = new GeneralCategoryRegex("Mc");
-	protected static final LexerRegex NUMBER_DECIMAL_REGEX         = new GeneralCategoryRegex("Nd");
-	protected static final LexerRegex NUMBER_LETTER_REGEX          = new GeneralCategoryRegex("Nl");
-	protected static final LexerRegex PUNCTUATION_CONNECTOR_REGEX  = new GeneralCategoryRegex("Pc");
-	protected static final LexerRegex OTHER_FORMAT_REGEX           = new GeneralCategoryRegex("Cf"); // Currently not used
-	protected static final LexerRegex SEPARATOR_SPACE_REGEX        = new GeneralCategoryRegex("Zs"); // Currently not used
-	protected static final LexerRegex SEPARATOR_LINE_REGEX         = new GeneralCategoryRegex("Zl");
-	protected static final LexerRegex SEPARATOR_PARAGRAPH_REGEX    = new GeneralCategoryRegex("Zp");
-	protected static final LexerRegex OTHER_PRIVATE_USE_REGEX      = new GeneralCategoryRegex("Co");
-	protected static final LexerRegex OTHER_SURROGATE_REGEX        = new GeneralCategoryRegex("Cs");
-
-	/**
-	 * Regexes matching various character classes defined by
-	 * the Ada 2012 specification.
-	 */
-	protected static final LexerRegex FORMAT_EFFECTOR_REGEX =
-		UnionRegex.fromRegexes(
-			HORIZONTAL_TABULATION_REGEX,
-			LINE_FEED_REGEX,
-			VERTICAL_TABULATION_REGEX,
-			FORM_FEED_REGEX,
-			CARRIAGE_RETURN_REGEX,
-			NEXT_LINE_REGEX,
-			SEPARATOR_LINE_REGEX,
-			SEPARATOR_PARAGRAPH_REGEX
-		);
-
-	protected static final LexerRegex OTHER_CONTROL_REGEX =
-		new IntersectionRegex(
-			new GeneralCategoryRegex("Cc"),
-			new NotRegex(FORMAT_EFFECTOR_REGEX)
-		);
-
-	protected static final LexerRegex GRAPHIC_CHARACTER_REGEX =
-		new NotRegex(
-			UnionRegex.fromRegexes(
-				OTHER_CONTROL_REGEX,
-				OTHER_PRIVATE_USE_REGEX,
-				OTHER_SURROGATE_REGEX,
-				FORMAT_EFFECTOR_REGEX,
-				new UnitRegex("\ufffe"),
-				new UnitRegex("\uffff")
-			)
-		);
-
-	// Identifiers
-
+	// Comments
 	/**
 	 * Regex defining the first character of an Ada identifier.
-	 *
+	 * <p>
 	 * identifier_start ::=
 	 *     letter_uppercase
 	 *   | letter_lowercase
@@ -127,11 +156,10 @@ abstract class Lexer extends LexerBase {
 			LETTER_OTHER_REGEX,
 			NUMBER_LETTER_REGEX
 		);
-
 	/**
 	 * Regex defining the additional character categories allowed
 	 * for non-first characters in an Ada identifier.
-	 *
+	 * <p>
 	 * identifier_extend ::=
 	 *     mark_non_spacing
 	 *   | mark_spacing_combining
@@ -146,9 +174,10 @@ abstract class Lexer extends LexerBase {
 			PUNCTUATION_CONNECTOR_REGEX
 		);
 
+	// String Literals
 	/**
 	 * Regex defining an Ada identifier.
-	 *
+	 * <p>
 	 * identifier ::=
 	 *     identifier_start {identifier_start | identifier_extend}
 	 */
@@ -162,11 +191,8 @@ abstract class Lexer extends LexerBase {
 				)
 			)
 		);
-
-	// Comments
-
 	/**
-	 * Regex defining a non-end-of-line character (useed to define comments).
+	 * Regex defining a non-end-of-line character (used to define comments).
 	 */
 	private static final LexerRegex NON_END_OF_LINE_CHARACTER_REGEX =
 		new NotRegex(
@@ -180,10 +206,9 @@ abstract class Lexer extends LexerBase {
 				SEPARATOR_PARAGRAPH_REGEX
 			)
 		);
-
 	/**
 	 * Regex defining an Ada comment.
-	 *
+	 * <p>
 	 * comment ::= --{non_end_of_line_character}
 	 */
 	protected static final LexerRegex COMMENT_REGEX =
@@ -192,46 +217,7 @@ abstract class Lexer extends LexerBase {
 			new ZeroOrMoreRegex(NON_END_OF_LINE_CHARACTER_REGEX)
 		);
 
-	// String Literals
-
-	/**
-	 * Regex defining a non-quotation-mark graphic character (used
-	 * to define string literals).
-	 *
-	 * A non-quotation-mark graphic character is defined as any
-	 * graphic_character other than the quotation mark character '"'
-	 */
-	private static final LexerRegex NON_QUOTATION_MARK_GRAPHIC_CHARACTER_REGEX =
-		new IntersectionRegex(
-			GRAPHIC_CHARACTER_REGEX,
-			new NotRegex(new UnitRegex("\""))
-		);
-
-	/**
-	 * Regex defining a string element (used to define string literals).
-	 *
-	 * string_element ::= "" | non_quotation_mark_graphic_character
-	 */
-	private static final LexerRegex STRING_ELEMENT_REGEX =
-		new UnionRegex(
-			new UnitRegex("\"\""),
-			NON_QUOTATION_MARK_GRAPHIC_CHARACTER_REGEX
-		);
-
-	/**
-	 * Regex defining an Ada string literal.
-	 *
-	 * string_literal ::= "{string_element}"
-	 */
-	protected static final LexerRegex STRING_LITERAL_REGEX =
-		ConcatenationRegex.fromRegexes(
-			new UnitRegex("\""),
-			new ZeroOrMoreRegex(STRING_ELEMENT_REGEX),
-			new UnitRegex("\"")
-		);
-
 	// Lexer data
-
 	/**
 	 * A map associating root regexes with the token types
 	 * they represent.
@@ -246,6 +232,38 @@ abstract class Lexer extends LexerBase {
 	/*
 		Instance Initializer
 	*/
+	/**
+	 * The lowercase version of the text to be analysed.
+	 */
+	protected CharSequence text;
+
+	/*
+		Fields
+	*/
+	/**
+	 * The end of the lexing range.
+	 */
+	protected int lexingEndOffset;
+	/**
+	 * The current position of the Lexer in the text.
+	 */
+	protected int lexingOffset;
+	/**
+	 * The current state of the Lexer.
+	 */
+	protected int state;
+	/**
+	 * The type of the last analysed token.
+	 */
+	protected IElementType tokenType;
+	/**
+	 * The start offset of the last analysed token.
+	 */
+	protected int tokenStart;
+	/**
+	 * The end offset of the last analysed token.
+	 */
+	protected int tokenEnd;
 
 	{
 
@@ -260,47 +278,67 @@ abstract class Lexer extends LexerBase {
 	}
 
 	/*
-		Fields
-	*/
-
-	/**
-	 * The lowercase version of the text to be analysed.
-	 */
-	protected CharSequence text;
-
-	/**
-	 * The end of the lexing range.
-	 */
-	protected int lexingEndOffset;
-
-	/**
-	 * The current position of the Lexer in the text.
-	 */
-	protected int lexingOffset;
-
-	/**
-	 * The current state of the Lexer.
-	 */
-	protected int state;
-
-	/**
-	 * The type of the last analysed token.
-	 */
-	protected IElementType tokenType;
-
-	/**
-	 * The start offset of the last analysed token.
-	 */
-	protected int tokenStart;
-
-	/**
-	 * The end offset of the last analysed token.
-	 */
-	protected int tokenEnd;
-
-	/*
 		Methods
 	*/
+
+	/**
+	 * Performs lexical analysis over the given text by running a single
+	 * iteration of `advance` and returning the first token encountered.
+	 *
+	 * @param text The text over which to perform analysis.
+	 * @return The first token in the given text.
+	 */
+	@Nullable
+	public static Token firstToken(CharSequence text) {
+
+		AdaLexer lexer = new AdaLexer();
+
+		lexer.start(text, 0, text.length(), 0);
+
+		return new Token(lexer.getTokenType(), lexer.getTokenStart(), lexer.getTokenEnd());
+
+	}
+
+	/**
+	 * Returns a token iterator that can be used to perform lazy lexical
+	 * analysis over the entire given text.
+	 *
+	 * @param text The text over which to perform analysis.
+	 * @return A lazy iterator over the tokens in the given text.
+	 */
+	public static Iterator<Token> textTokens(CharSequence text) {
+
+		final AdaLexer lexer = new AdaLexer();
+
+		lexer.start(text, 0, text.length(), 0);
+
+		return new Iterator<Token>() {
+
+			/**
+			 * @see java.util.Iterator#hasNext()
+			 */
+			@Override
+			public boolean hasNext() { return lexer.getTokenType() != null; }
+
+			/**
+			 * @see java.util.Iterator#next()
+			 */
+			@Override
+			public Token next() {
+
+				IElementType tokenType   = lexer.getTokenType();
+				int          startOffset = lexer.getTokenStart();
+				int          endOffset   = lexer.getTokenEnd();
+
+				lexer.advance();
+
+				return new Token(tokenType, startOffset, endOffset);
+
+			}
+
+		};
+
+	}
 
 	/**
 	 * Returns the token type to use for lexically invalid characters.
@@ -333,10 +371,10 @@ abstract class Lexer extends LexerBase {
 	}
 
 	/**
-	 * Returns whether or not this lexer has reached the end of
+	 * Returns whether this lexer has reached the end of
 	 * the text being analysed.
 	 *
-	 * @return Whether or not the end of the text was reached.
+	 * @return Whether the end of the text was reached.
 	 */
 	protected boolean reachedEndOfText() {
 		return lexingOffset == lexingEndOffset;
@@ -474,7 +512,7 @@ abstract class Lexer extends LexerBase {
 
 		// While the next token has not been determined...
 
-		characterLoop: // label only used for reference in comments
+		// label only used for reference in comments
 		while (tokenEnd == tokenStart) {
 
 			final Character character = nextCharacter;
@@ -534,25 +572,25 @@ abstract class Lexer extends LexerBase {
 				// that has a higher priority than the identifier regex, and it
 				// does match the sequence "proc" (but it should not be chosen
 				// as its advanced regex at that point is not nullable, in other
-				// words it still requires the sequence "edure" to "fully match")
+				// words it still requires the sequence "endure" to "fully match")
 
 				LexerRegex highestPriorityRegex = null;
 
 				for (LexerRegex regex : matchingRegexes) {
 
 					if (
-						regex.nullable() &&
-							(
-								highestPriorityRegex == null ||
-									regex.PRIORITY > highestPriorityRegex.PRIORITY
-							)
+							regex.nullable() &&
+									(
+											highestPriorityRegex == null ||
+													regex.PRIORITY > highestPriorityRegex.PRIORITY
+									)
 					) {
 						highestPriorityRegex = regex;
 					}
 
 				}
 
-				// If a non nullable regex (with highest priority) was found,
+				// If a non-nullable regex (with the highest priority) was found,
 				// then get the root regex from which this regex originates,
 				// get the token type corresponding to that root regex and set
 				// the lexer token type to that type
@@ -560,10 +598,10 @@ abstract class Lexer extends LexerBase {
 				if (highestPriorityRegex != null) {
 
 					LexerRegex rootRegex =
-						regexLineages.getOrDefault(highestPriorityRegex, highestPriorityRegex);
+							regexLineages.getOrDefault(highestPriorityRegex, highestPriorityRegex);
 
 					tokenType =
-						REGEX_TOKEN_TYPES.get(rootRegex);
+							REGEX_TOKEN_TYPES.get(rootRegex);
 
 				}
 
@@ -577,7 +615,9 @@ abstract class Lexer extends LexerBase {
 					// needs to be advanced manually to avoid infinite calls
 					// to `advance`
 
-					if (lexingOffset == tokenStart) { lexingOffset++; }
+					if (lexingOffset == tokenStart) {
+						lexingOffset++;
+					}
 
 					// Reset the rollback offset
 
@@ -627,13 +667,17 @@ abstract class Lexer extends LexerBase {
 				lexingOffset++;
 
 				nextCharacter = lexingOffset == lexingEndOffset ?
-					null : text.charAt(lexingOffset);
+						null : text.charAt(lexingOffset);
 
 			}
 
 		}
 
 	}
+
+	/*
+		Convenience Classes and Methods
+	*/
 
 	/**
 	 * @see com.intellij.lexer.Lexer#getBufferSequence()
@@ -647,10 +691,6 @@ abstract class Lexer extends LexerBase {
 	 */
 	@Override
 	public int getBufferEnd() { return lexingEndOffset; }
-
-	/*
-		Convenience Classes and Methods
-	*/
 
 	/**
 	 * Simple data class representing a token.
@@ -679,7 +719,7 @@ abstract class Lexer extends LexerBase {
 		}
 
 		/**
-		 * Returns whether or not this token is equal to the given object.
+		 * Returns whether this token is equal to the given object.
 		 *
 		 * @param object The object to compare to this token.
 		 * @return The result of the comparison.
@@ -708,65 +748,6 @@ abstract class Lexer extends LexerBase {
 		public String toString() {
 			return "Token(" + TOKEN_TYPE + ", " + START_OFFSET + ", " + END_OFFSET + ")";
 		}
-
-	}
-
-	/**
-	 * Performs lexical analysis over the given text by running a single
-	 * iteration of `advance` and returning the first token encountered.
-	 *
-	 * @param text The text over which to perform analysis.
-	 * @return The first token in the given text.
-	 */
-	@Nullable
-	public static Token firstToken(CharSequence text) {
-
-		AdaLexer lexer = new AdaLexer();
-
-		lexer.start(text, 0, text.length(), 0);
-
-		return new Token(lexer.getTokenType(), lexer.getTokenStart(), lexer.getTokenEnd());
-
-	}
-
-	/**
-	 * Returns a token iterator that can be used to perform lazy lexical
-	 * analysis over the entire given text.
-	 *
-	 * @param text The text over which to perform analysis.
-	 * @return A lazy iterator over the tokens in the given text.
-	 */
-	public static Iterator<Token> textTokens(CharSequence text) {
-
-		final AdaLexer lexer = new AdaLexer();
-
-		lexer.start(text, 0, text.length(), 0);
-
-		return new Iterator<Token>() {
-
-			/**
-			 * @see java.util.Iterator#hasNext()
-			 */
-			@Override
-			public boolean hasNext() { return lexer.getTokenType() != null; }
-
-			/**
-			 * @see java.util.Iterator#next()
-			 */
-			@Override
-			public Token next() {
-
-				IElementType tokenType   = lexer.getTokenType();
-				int          startOffset = lexer.getTokenStart();
-				int          endOffset   = lexer.getTokenEnd();
-
-				lexer.advance();
-
-				return new Token(tokenType, startOffset, endOffset);
-
-			}
-
-		};
 
 	}
 

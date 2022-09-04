@@ -1,11 +1,10 @@
 package com.adacore.adaintellij.analysis.lexical;
 
+import com.adacore.adaintellij.GPRLanguage;
 import com.intellij.lang.Language;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.GPRLanguage;
 
 /**
  * GPR file token type.

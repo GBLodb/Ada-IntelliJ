@@ -1,15 +1,15 @@
 package com.adacore.adaintellij;
 
-import java.awt.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.text.JTextComponent;
-
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /**
  * UI-specific utilities.
@@ -17,21 +17,19 @@ import org.jetbrains.annotations.NotNull;
 public final class UIUtils {
 
 	/**
+	 * File chooser descriptor for choosing single files only.
+	 */
+	public static final FileChooserDescriptor SINGLE_FILE_CHOOSER_DESCRIPTOR =
+		new FileChooserDescriptor(true, false, false, false, false, false);
+	/**
 	 * Light/dark color pair used for component borders.
 	 */
 	private static final Color BORDER_COLOR = new JBColor(0xbbbbbb, 0x555555);
-
 	/**
 	 * Various UI-related constants.
 	 */
 	private static final int LABEL_ICON_TEXT_GAP   = 5;
 	private static final int ADJUSTED_SCROLL_SPEED = 12;
-
-	/**
-	 * File chooser descriptor for choosing single files only.
-	 */
-	public static final FileChooserDescriptor SINGLE_FILE_CHOOSER_DESCRIPTOR =
-		new FileChooserDescriptor(true, false, false, false, false, false);
 
 	/**
 	 * Adds a simple line border to the given component.
@@ -107,12 +105,12 @@ public final class UIUtils {
 	) { traverse(container, classToHandle, handler); }
 
 	/**
-	 * Returns whether or not the given container has at least one UI
+	 * Returns whether the given container has at least one UI
 	 * descendant that is a `JTextComponent` and whose text content is
 	 * effectively empty (empty or whitespace only).
 	 *
 	 * @param container The container to test.
-	 * @return Whether or not the given component has an effectively
+	 * @return Whether the given component has an effectively
 	 *         empty text component descendant.
 	 */
 	public static boolean hasEffectivelyEmptyTextComponentDescendant(@NotNull Container container) {
@@ -136,7 +134,7 @@ public final class UIUtils {
 	/**
 	 * Internal UI container traversal method. Performs recursive,
 	 * depth-first traversal of the given container. Returns a boolean
-	 * to indicate whether or not traversal should be stopped.
+	 * to indicate whether traversal should be stopped.
 	 *
 	 * @param container The root container to traverse.
 	 * @param classToHandle The component class/interface to handle.

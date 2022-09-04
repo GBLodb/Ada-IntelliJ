@@ -1,12 +1,14 @@
 package com.adacore.adaintellij.analysis.lexical;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.*;
-
 import com.adacore.adaintellij.analysis.lexical.regex.*;
+import com.intellij.psi.tree.IElementType;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.adacore.adaintellij.analysis.lexical.AdaTokenTypes.*;
 
@@ -60,14 +62,14 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining a digit.
-	 *
+	 * <p>
 	 * digit ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
 	 */
 	private static final LexerRegex DIGIT_REGEX = UnionRegex.fromRange('0', '9');
 
 	/**
 	 * Regex defining a numeral (used to define numeric literals).
-	 *
+	 * <p>
 	 * numeral ::= digit {[underline] digit}
 	 */
 	private static final LexerRegex NUMERAL_REGEX =
@@ -83,8 +85,8 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining an exponent (used to define numeric literals).
-	 *
-	 * exponent ::= e [+] numeral | e – numeral
+	 * <p>
+	 * exponent ::= e [+] numeral | e - numeral
 	 */
 	private static final LexerRegex EXPONENT_REGEX =
 		ConcatenationRegex.fromRegexes(
@@ -100,7 +102,7 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining an Ada decimal literal.
-	 *
+	 * <p>
 	 * decimal_literal ::= numeral [.numeral] [exponent]
 	 */
 	private static final LexerRegex DECIMAL_LITERAL_REGEX =
@@ -119,14 +121,14 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining a base (used to define based literals).
-	 *
+	 * <p>
 	 * base ::= numeral
 	 */
 	private static final LexerRegex BASE_REGEX = NUMERAL_REGEX;
 
 	/**
 	 * Regex defining an extended digit (hexadecimal digit).
-	 *
+	 * <p>
 	 * extended_digit ::= digit | a | b | c | d | e | f
 	 */
 	private static final LexerRegex EXTENDED_DIGIT_REGEX =
@@ -142,7 +144,7 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining a based numeral (used to define based literals).
-	 *
+	 * <p>
 	 * based_numeral ::=
 	 *     extended_digit {[underline] extended_digit}
 	 */
@@ -159,7 +161,7 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining an Ada based literal.
-	 *
+	 * <p>
 	 * based_literal ::=
 	 *     base # based_numeral [.based_numeral] # [exponent]
 	 */
@@ -182,7 +184,7 @@ public final class AdaLexer extends Lexer {
 
 	/**
 	 * Regex defining an Ada character literal.
-	 *
+	 * <p>
 	 * character_literal ::= 'graphic_character'
 	 */
 	private static final LexerRegex CHARACTER_LITERAL_REGEX =

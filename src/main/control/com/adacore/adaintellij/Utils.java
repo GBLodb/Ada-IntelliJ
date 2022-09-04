@@ -1,17 +1,19 @@
 package com.adacore.adaintellij;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Global plugin utilities.
@@ -35,7 +37,7 @@ public final class Utils {
 	/**
 	 * File/document manager for retrieving `VirtualFile` and `Document` instances.
 	 */
-	private static FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+	private static final FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
 
 	/**
 	 * Private default constructor to prevent instantiation.
@@ -68,12 +70,12 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns whether or not the given path points to a file or directory
+	 * Returns whether the given path points to a file or directory
 	 * that is in the file hierarchy of the given project.
 	 *
 	 * @param project The base project.
 	 * @param path The absolute path to test.
-	 * @return Whether or not the path target is in the project hierarchy.
+	 * @return Whether the path target is in the project hierarchy.
 	 */
 	public static boolean isInProjectHierarchy(@NotNull Project project, @NotNull String path) {
 		return getPathRelativeToProjectBase(project, path) != null;
@@ -109,13 +111,13 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns whether or not an executable with the given name is on
+	 * Returns whether an executable with the given name is on
 	 * the system PATH.
 	 *
 	 * @param executableName The name of the executable to search for.
-	 * @param withExtension Whether or not the search should take
+	 * @param withExtension Whether the search should take
 	 *                      file extensions into consideration.
-	 * @return Whether or not the executable is on the path.
+	 * @return Whether the executable is on the path.
 	 */
 	public static boolean isOnSystemPath(String executableName, boolean withExtension) {
 		return getPathFromSystemPath(executableName, withExtension) != null;
@@ -127,8 +129,8 @@ public final class Utils {
 	 * executable was found.
 	 *
 	 * @param executableName The name of the executable to search for.
-	 * @param withExtension Whether or not the search should take
-	 *                      file extensions into consideartion.
+	 * @param withExtension Whether the search should take
+	 *                      file extensions into consideration.
 	 * @return The absolute path to the executable.
 	 */
 	@Nullable
@@ -246,12 +248,12 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns whether or not the given PSI files represent the
+	 * Returns whether the given PSI files represent the
 	 * same underlying file.
 	 *
 	 * @param file1 The first PSI file to test.
 	 * @param file2 The second PSI file to test.
-	 * @return Whether or not the given PSI files are equivalent.
+	 * @return Whether the given PSI files are equivalent.
 	 */
 	public static boolean psiFilesRepresentSameFile(
 		@NotNull PsiFile file1,
@@ -266,12 +268,12 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns whether or not the given documents represent the
+	 * Returns whether the given documents represent the
 	 * same underlying file.
 	 *
 	 * @param document1 The first document to test.
 	 * @param document2 The second document to test.
-	 * @return Whether or not the given documents are equivalent.
+	 * @return Whether the given documents are equivalent.
 	 */
 	public static boolean documentsRepresentSameFile(
 		@NotNull Document document1,

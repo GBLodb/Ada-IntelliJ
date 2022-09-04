@@ -1,10 +1,3 @@
-pluginManagement {
-    repositories {
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-        }
-        gradlePluginPortal()
-    }
-}
+import org.apache.tools.ant.DirectoryScanner
 
 rootProject.name = 'Ada-IntelliJ'

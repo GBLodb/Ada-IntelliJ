@@ -1,20 +1,21 @@
 package com.adacore.adaintellij.dialogs;
 
-import java.awt.event.*;
-import java.util.List;
-import javax.swing.*;
-
+import com.adacore.adaintellij.UIUtils;
+import com.adacore.adaintellij.misc.BasicListCellRenderer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.misc.BasicListCellRenderer;
-import com.adacore.adaintellij.UIUtils;
+import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
 /**
  * A simple dialog allowing the user to select an item from a list:
- *
+ * <p>
  *         +----------------------------------------+
  *         |                                        |
  *         |               Main text                |

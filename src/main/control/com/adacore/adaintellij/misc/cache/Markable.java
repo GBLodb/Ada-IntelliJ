@@ -28,11 +28,11 @@ public interface Markable extends Cacher {
 	}
 
 	/**
-	 * Returns whether or not this markable has been marked
+	 * Returns whether this markable has been marked
 	 * with the given marker.
 	 *
 	 * @param marker The marker to check in this markable.
-	 * @return Whether or not this markable has been marked
+	 * @return Whether this markable has been marked
 	 *         with the given marker.
 	 */
 	default boolean isMarked(@NotNull Marker marker) {

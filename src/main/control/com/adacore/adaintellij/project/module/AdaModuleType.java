@@ -1,12 +1,11 @@
 package com.adacore.adaintellij.project.module;
 
-import javax.swing.*;
-
+import com.adacore.adaintellij.Icons;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
-import com.adacore.adaintellij.Icons;
+import javax.swing.*;
 
 /**
  * Ada module type. Modules of this type are configured

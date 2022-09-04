@@ -1,19 +1,26 @@
 package com.adacore.adaintellij.settings;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.*;
-import com.intellij.ui.DocumentAdapter;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.project.GPRFileManager;
 import com.adacore.adaintellij.UIUtils;
 import com.adacore.adaintellij.Utils;
+import com.adacore.adaintellij.project.GPRFileManagerService;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.DocumentAdapter;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Project-specific settings UI for Ada projects.
@@ -37,7 +44,6 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 	 * Button actions.
 	 */
 	private Action okAction;
-	private Action cancelAction;
 	private Action applyAction;
 
 	/**
@@ -48,12 +54,12 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 	/**
 	 * The project that this settings view represents.
 	 */
-	private Project project;
+	private final Project project;
 
 	/**
 	 * The GPR file manager component of this settings view's project.
 	 */
-	private GPRFileManager gprFileManager;
+	private final GPRFileManagerService gprFileManagerService;
 
 	/**
 	 * Constructs a new AdaProjectSettings given a project.
@@ -65,7 +71,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 		super(project, false, IdeModalityType.PROJECT);
 
 		this.project        = project;
-		this.gprFileManager = GPRFileManager.getInstance(project);
+		this.gprFileManagerService = GPRFileManagerService.getInstance(project);
 
 		// Initialize the dialog
 
@@ -175,7 +181,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 
 		String newGprFilePath = gprFilePathField.getText();
 
-		gprFileManager.setGprFilePath(newGprFilePath);
+		gprFileManagerService.setGprFilePath(newGprFilePath);
 		lastSetGprFilePath = newGprFilePath;
 
 	}
@@ -186,7 +192,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 	@Override
 	public void reset() {
 
-		String gprFilePath = gprFileManager.getGprFilePath();
+		String gprFilePath = gprFileManagerService.getGprFilePath();
 
 		gprFilePathField.setText(gprFilePath);
 		lastSetGprFilePath = gprFilePath;
@@ -229,7 +235,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 
 		// "Cancel" button action
 
-		cancelAction = new DialogWrapperExitAction("Cancel", 2);
+		Action cancelAction = new DialogWrapperExitAction("Cancel", 2);
 
 		// "Apply" button action
 
@@ -255,7 +261,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 
 		return new Action[] {
 			okAction,
-			cancelAction,
+				cancelAction,
 			applyAction
 		};
 
@@ -266,6 +272,7 @@ public final class AdaProjectSettings extends DialogWrapper implements Validatab
 	 */
 	@Nullable
 	@Override
+	@SuppressWarnings("MissingRecentApi")
 	public JComponent getPreferredFocusedComponent() {
 		return gprFilePathField;
 	}

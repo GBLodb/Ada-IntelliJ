@@ -1,33 +1,27 @@
 package com.adacore.adaintellij.misc;
 
-import java.awt.*;
-import javax.swing.*;
-
+import com.adacore.adaintellij.UIUtils;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import com.adacore.adaintellij.UIUtils;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * List cell renderer adding a configurable icon and
- * discretized indentation.
+ * discrete indentation.
  */
 public class IndentedIconedListCellRenderer extends BasicListCellRenderer {
 
 	/**
-	 * Cell content indentation factor.
-	 */
-	private static int INDENTATION_FACTOR = 20;
-
-	/**
 	 * Cell content indentation.
 	 */
-	private int indentation;
+	private final int indentation;
 
 	/**
 	 * Cell icon.
 	 */
-	private Icon icon;
+	private final Icon icon;
 
 	/**
 	 * Constructs a new IndentedIconedListCellRenderer given
@@ -61,6 +55,10 @@ public class IndentedIconedListCellRenderer extends BasicListCellRenderer {
 			list, value, index, isSelected, cellHasFocus);
 
 		UIUtils.addIconWithGap(label, icon);
+		/**
+		 * Cell content indentation factor.
+		 */
+		int INDENTATION_FACTOR = 20;
 		label.setBorder(JBUI.Borders.empty(2, 2 + indentation * INDENTATION_FACTOR, 2, 2));
 
 		return label;

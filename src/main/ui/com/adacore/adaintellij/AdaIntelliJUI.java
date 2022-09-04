@@ -20,7 +20,7 @@ public abstract class AdaIntelliJUI {
 	 * Its value is null if this view is not embedded in another UI.
 	 */
 	@Nullable
-	private AdaIntelliJUI parentUI;
+	private final AdaIntelliJUI parentUI;
 
 	/**
 	 * Constructs a new AdaIntelliJUI that is either a standalone UI

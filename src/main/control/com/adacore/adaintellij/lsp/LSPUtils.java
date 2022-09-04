@@ -6,10 +6,9 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.impl.DocumentImpl;
-import org.jetbrains.annotations.*;
-
 import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.Range;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.adacore.adaintellij.analysis.syntactic.AdaPsiElement.AdaElementType;
 
@@ -157,7 +156,10 @@ public final class LSPUtils {
 			offsetToPosition(copyOfOldDoc, offset),
 			offsetToPosition(copyOfOldDoc, offset + oldLength)
 		));
-		changeEvent.setRangeLength(oldLength);
+        changeEvent.setRange(new Range(
+                offsetToPosition(copyOfOldDoc, oldLength),
+                offsetToPosition(copyOfOldDoc, oldLength * 2)
+        ));
 		changeEvent.setText(event.getNewFragment().toString());
 
 		return changeEvent;

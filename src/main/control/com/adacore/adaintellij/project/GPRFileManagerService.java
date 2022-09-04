@@ -1,40 +1,39 @@
 package com.adacore.adaintellij.project;
 
-import java.util.*;
-import java.util.function.Consumer;
-import javax.swing.*;
-
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
-import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
-import org.jetbrains.annotations.*;
-
 import com.adacore.adaintellij.dialogs.ListChooserDialog;
 import com.adacore.adaintellij.file.GPRFileType;
 import com.adacore.adaintellij.notifications.AdaIJNotification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.vfs.VfsUtil;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Project component handling everything related to GPR files.
  */
-public class GPRFileManager implements ProjectComponent {
+public class GPRFileManagerService {
 
 	/**
 	 * The project to which this component belongs.
 	 */
-	private Project project;
+	Project project;
 
 	/**
 	 * The corresponding Ada project component.
 	 */
-	private AdaProject adaProject;
+	AdaProjectService adaProjectService;
 
 	/**
 	 * The path to the GPR file configured for the project
 	 * to which this manager component belongs.
 	 */
-	private String gprFilePath = "";
+	String gprFilePath = "";
 
 	/**
 	 * The set of registered listeners for changes of the GPR file path.
@@ -48,25 +47,25 @@ public class GPRFileManager implements ProjectComponent {
 	 * Moreover, every class should assign different names to its own keys
 	 * to avoid collisions.
 	 */
-	private Map<String, Consumer<String>> gprFileChangeListeners = new HashMap<>();
+	Map<String, Consumer<String>> gprFileChangeListeners = new HashMap<>();
 
 	/**
-	 * Whether or not the user has already been notified about the selected
+	 * Whether the user has already been notified about the selected
 	 * GPR file, or about the fact that no such file was found in the project
 	 * structure.
 	 */
-	private boolean notifiedAboutGprFile = false;
+	boolean notifiedAboutGprFile = false;
 
 	/**
 	 * Constructs a new GPRFileManager given a project.
 	 *
 	 * @param project The project to attach to the constructed manager.
-	 * @param adaProject The Ada project component to attach to the
+	 * @param adaProjectService The Ada project component to attach to the
 	 *                   constructed manager.
 	 */
-	public GPRFileManager(Project project, AdaProject adaProject) {
+	public GPRFileManagerService(Project project, AdaProjectService adaProjectService) {
 		this.project    = project;
-		this.adaProject = adaProject;
+		this.adaProjectService = adaProjectService;
 	}
 
 	/**
@@ -76,39 +75,8 @@ public class GPRFileManager implements ProjectComponent {
 	 * @return The project component.
 	 */
 	@NotNull
-	public static GPRFileManager getInstance(@NotNull Project project) {
-		return project.getComponent(GPRFileManager.class);
-	}
-
-	/**
-	 * @see com.intellij.openapi.components.NamedComponent#getComponentName()
-	 */
-	@Override
-	@NotNull
-	public String getComponentName() { return "com.adacore.adaintellij.project.GPRFileManager"; }
-
-	/**
-	 * @see com.intellij.openapi.components.ProjectComponent#projectOpened()
-	 */
-	@Override
-	public void projectOpened() {
-
-		if (!adaProject.isAdaProject()) { return; }
-
-		setGprFilePath(getGprFilePathOrChoose());
-
-		if (!"".equals(gprFilePath) && !notifiedAboutGprFile) {
-
-			Notifications.Bus.notify(new AdaIJNotification(
-				"Project File",
-				"Using the following project file:\n" + gprFilePath,
-				NotificationType.INFORMATION
-			));
-
-			notifiedAboutGprFile = true;
-
-		}
-
+	public static GPRFileManagerService getInstance(@NotNull Project project) {
+		return project.getComponent(GPRFileManagerService.class);
 	}
 
 	/**
@@ -120,6 +88,26 @@ public class GPRFileManager implements ProjectComponent {
 	 */
 	@NotNull
 	public String getGprFilePath() { return gprFilePath; }
+
+	/**
+	 * Sets the GPR file path to the given path and notifies all
+	 * GPR file path change listeners.
+	 *
+	 * @param path The new GPR file path.
+	 */
+	public void setGprFilePath(@NotNull final String path) {
+
+		if (!adaProjectService.isAdaProject()) { return; }
+
+		if (!path.equals(gprFilePath)) {
+
+			gprFilePath = path;
+
+			gprFileChangeListeners.forEach((key, listener) -> listener.accept(path));
+
+		}
+
+	}
 
 	/**
 	 * Returns the path to the GPR file of this manager's project.
@@ -135,7 +123,7 @@ public class GPRFileManager implements ProjectComponent {
 	@NotNull
 	public String getGprFilePathOrChoose() {
 
-		if (!adaProject.isAdaProject()) { return gprFilePath; }
+		if (!adaProjectService.isAdaProject()) { return gprFilePath; }
 
 		// If the GPR file path is set, then return it
 
@@ -149,7 +137,7 @@ public class GPRFileManager implements ProjectComponent {
 		final List<String> gprFilePaths = new ArrayList<>();
 
 		VfsUtil.iterateChildrenRecursively(
-			project.getBaseDir(),
+			Objects.requireNonNull(ProjectUtil.guessProjectDir(project)),
 			null,
 			fileOrDir -> {
 
@@ -240,35 +228,15 @@ public class GPRFileManager implements ProjectComponent {
 	}
 
 	/**
-	 * Sets the GPR file path to the given path and notifies all
-	 * GPR file path change listeners.
-	 *
-	 * @param path The new GPR file path.
-	 */
-	public void setGprFilePath(@NotNull final String path) {
-
-		if (!adaProject.isAdaProject()) { return; }
-
-		if (!path.equals(gprFilePath)) {
-
-			gprFilePath = path;
-
-			gprFileChangeListeners.forEach((key, listener) -> listener.accept(path));
-
-		}
-
-	}
-
-	/**
 	 * Registers the given listener with the given key to GPR file change events.
-	 * @see GPRFileManager#gprFileChangeListeners
+	 * @see GPRFileManagerService#gprFileChangeListeners
 	 *
 	 * @param key The key of the listener to register.
 	 * @param listener The listener to register.
 	 */
 	public void addGprFileChangeListener(String key, Consumer<String> listener) {
 
-		if (!adaProject.isAdaProject()) { return; }
+		if (!adaProjectService.isAdaProject()) { return; }
 
 		gprFileChangeListeners.put(key, listener);
 
@@ -276,13 +244,13 @@ public class GPRFileManager implements ProjectComponent {
 
 	/**
 	 * Unregisters the listener with the given key from GPR file change events.
-	 * @see GPRFileManager#gprFileChangeListeners
+	 * @see GPRFileManagerService#gprFileChangeListeners
 	 *
 	 * @param key The key of the listener to unregister.
 	 */
 	public void removeGprFileChangeListener(String key) {
 
-		if (!adaProject.isAdaProject()) { return; }
+		if (!adaProjectService.isAdaProject()) { return; }
 
 		gprFileChangeListeners.remove(key);
 

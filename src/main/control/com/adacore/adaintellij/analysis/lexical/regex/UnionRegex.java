@@ -1,8 +1,11 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import org.jetbrains.annotations.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Regex matching the union of two subregexes.
@@ -47,7 +50,7 @@ public final class UnionRegex extends LexerRegex {
 	/**
 	 * Returns a new hierarchy of union regexes representing the union
 	 * of a list of regexes:
-	 *
+	 * <p>
 	 *             union_regex
 	 *              /      \
 	 *          regex_1   union_regex
@@ -60,7 +63,7 @@ public final class UnionRegex extends LexerRegex {
 	 *                         regex_n-2   union_regex
 	 *                                      /      \
 	 *                                regex_n-1  regex_n
-	 *
+	 * <p>
 	 * The priority of the returned root regex is set to that of the
 	 * regex in the given list with the highest priority.
 	 *

@@ -1,14 +1,14 @@
 package com.adacore.adaintellij.build;
 
+import com.adacore.adaintellij.AdaIntelliJUI;
+import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.*;
-
-import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.AdaIntelliJUI;
 
 /**
  * GPRbuild scenario variable settings view.
@@ -157,32 +157,6 @@ public final class ScenarioSettingsView extends AdaIntelliJUI {
 	}
 
 	/**
-	 * Sets the field values given a map of scenario variable settings.
-	 *
-	 * @param scenarioVariables The scenario variable settings from which
-	 *                          to set fields.
-	 */
-	void setScenarioVariables(@NotNull Map<String, String> scenarioVariables) {
-
-		// Remove all children
-
-		for (Component child : variablesPanel.getComponents()) {
-			variablesPanel.remove(child);
-		}
-
-		rowCount = 0;
-
-		// Add given variable settings
-
-		scenarioVariables.forEach(this::addScenarioVariable);
-
-		// Update the UI
-
-		updateUI();
-
-	}
-
-	/**
 	 * Returns the scenario variable settings in this view's fields as a map.
 	 *
 	 * @return The entered scenario variable settings.
@@ -207,6 +181,32 @@ public final class ScenarioSettingsView extends AdaIntelliJUI {
 		}
 
 		return scenarioVariables;
+
+	}
+
+	/**
+	 * Sets the field values given a map of scenario variable settings.
+	 *
+	 * @param scenarioVariables The scenario variable settings from which
+	 *                          to set fields.
+	 */
+	void setScenarioVariables(@NotNull Map<String, String> scenarioVariables) {
+
+		// Remove all children
+
+		for (Component child : variablesPanel.getComponents()) {
+			variablesPanel.remove(child);
+		}
+
+		rowCount = 0;
+
+		// Add given variable settings
+
+		scenarioVariables.forEach(this::addScenarioVariable);
+
+		// Update the UI
+
+		updateUI();
 
 	}
 

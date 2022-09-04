@@ -1,10 +1,10 @@
 package com.adacore.adaintellij.project.template;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Immutable data class representation of an Ada
@@ -168,12 +168,12 @@ public final class ProjectTemplateDescriptor {
 		/**
 		 * Data for the project template descriptor being built.
 		 */
-		private VirtualFile            templateDirectory;
+		private final VirtualFile            templateDirectory;
 		private String                 templateName        = "";
 		private String                 templateCategory    = "";
-		private StringBuilder          templateDescription = new StringBuilder();
+		private final StringBuilder          templateDescription = new StringBuilder();
 		private String                 projectFileName     = "";
-		private List<TemplateVariable> templateVariables   = new ArrayList<>();
+		private final List<TemplateVariable> templateVariables   = new ArrayList<>();
 
 		/**
 		 * Constructs a new Builder given a resource directory for

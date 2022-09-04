@@ -1,26 +1,39 @@
 package com.adacore.adaintellij.build;
 
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.*;
-
-import com.intellij.execution.*;
+import com.adacore.adaintellij.notifications.AdaIJNotification;
+import com.adacore.adaintellij.project.GPRFileManagerService;
+import com.intellij.execution.DefaultExecutionResult;
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ExecutionResult;
+import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
-import com.intellij.execution.filters.*;
-import com.intellij.execution.process.*;
-import com.intellij.execution.runners.*;
+import com.intellij.execution.filters.Filter;
+import com.intellij.execution.filters.OpenFileHyperlinkInfo;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessHandler;
+import com.intellij.execution.process.ProcessTerminatedListener;
+import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.notification.*;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ArrayUtil;
-import org.jetbrains.annotations.*;
-
 import org.jdom.Element;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.notifications.AdaIJNotification;
-import com.adacore.adaintellij.project.GPRFileManager;
+import java.util.*;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Run configuration for running GPRbuild.
@@ -28,25 +41,22 @@ import com.adacore.adaintellij.project.GPRFileManager;
 public final class GPRbuildConfiguration extends RunConfigurationBase {
 
 	/**
+	 * Whether the user has already been notified about using
+	 * the "-gnatef" flag for gprbuild output file location hyperlinks.
+	 */
+	private static boolean notifiedAboutFullPathFlag = false;
+	/**
 	 * The project in which this configuration will be run.
 	 */
-	private Project project;
-
+	private final Project project;
 	/**
 	 * The arguments that will be passed to gprbuild.
 	 */
 	private String gprbuildArguments = "";
-
 	/**
 	 * The scenario variables that will be passed to gprbuild.
 	 */
 	private Map<String, String> scenarioVariables = new HashMap<>();
-
-	/**
-	 * Whether or not the user has already been notified about using
-	 * the "-gnatef" flag for gprbuild output file location hyperlinks.
-	 */
-	private static boolean notifiedAboutFullPathFlag = false;
 
 	/**
 	 * Constructs a new GPRbuildConfiguration given a project, a factory
@@ -131,10 +141,10 @@ public final class GPRbuildConfiguration extends RunConfigurationBase {
 			@Override
 			protected ProcessHandler startProcess() throws ExecutionException {
 
-				GPRFileManager gprFileManager = GPRFileManager.getInstance(project);
+				GPRFileManagerService gprFileManagerService = GPRFileManagerService.getInstance(project);
 
-				String gprbuildPath = GPRbuildManager.getGprbuildPath();
-				String gprFilePath  = gprFileManager.getGprFilePathOrChoose();
+				String gprbuildPath = GPRbuildManagerService.getGprbuildPath();
+				String gprFilePath  = gprFileManagerService.getGprFilePathOrChoose();
 
 				if ("".equals(gprbuildPath)) {
 					throw new ExecutionException(

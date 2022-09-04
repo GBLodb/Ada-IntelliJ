@@ -1,5 +1,18 @@
 package com.adacore.adaintellij.project.template;
 
+import com.adacore.adaintellij.ResourceManager;
+import com.adacore.adaintellij.Utils;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.UndoConfirmationPolicy;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.ProjectUtil;
+import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -8,19 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.ResourceManager;
-import com.adacore.adaintellij.Utils;
 
 import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor.TemplateVariableSetting;
 
@@ -33,23 +33,20 @@ public final class ProjectTemplateManager {
 	 * Project template descriptor file extension.
 	 */
 	static final String TEMPLATE_DESCRIPTOR_FILE_EXTENSION = "gpt";
-
-	/**
-	 * Class-wide logger for the ProjectTemplateManager class.
-	 */
-	private static Logger LOGGER = Logger.getInstance(Utils.class);
-
 	/**
 	 * Resource directory containing all project templates.
 	 */
 	private static final VirtualFile TEMPLATES_ROOT_DIRECTORY =
 		ResourceManager.getResourceDirectory("/project-templates");
-
 	/**
 	 * Template variable text markers.
 	 */
 	private static final String TEMPLATE_VARIABLE_PREFIX = "@_";
 	private static final String TEMPLATE_VARIABLE_SUFFIX = "_@";
+	/**
+	 * Class-wide logger for the ProjectTemplateManager class.
+	 */
+	private static final Logger LOGGER = Logger.getInstance(Utils.class);
 
 	/**
 	 * Returns template descriptors for all available project
@@ -119,7 +116,7 @@ public final class ProjectTemplateManager {
 
 		// Add the project base directory as a content root
 
-		VirtualFile projectBaseDir = modifiableRootModel.getProject().getBaseDir();
+		VirtualFile projectBaseDir = Objects.requireNonNull(ProjectUtil.guessProjectDir(modifiableRootModel.getProject()));
 
 		modifiableRootModel.addContentEntry(projectBaseDir);
 

@@ -1,10 +1,12 @@
 package com.adacore.adaintellij.misc.cache;
 
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-
 import com.intellij.openapi.util.Key;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Random;
 
 /**
  * Cache key representing cached data in a `Cacher`.
@@ -16,7 +18,7 @@ public class CacheKey<T> extends Key<CacheData<T>> {
 	/**
 	 * Class-wide random number generator.
 	 */
-	private static Random RANDOM_NUMBER_GENERATOR = new Random();
+	private static final Random RANDOM_NUMBER_GENERATOR = new Random();
 
 	/**
 	 * Constructs a new CacheKey.

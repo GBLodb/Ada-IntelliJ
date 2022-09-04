@@ -1,13 +1,17 @@
 package com.adacore.adaintellij.misc;
 
-import java.awt.event.*;
+import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.swing.*;
-
-import com.intellij.ui.components.JBList;
-import org.jetbrains.annotations.*;
 
 /**
  * A sequence of "interconnected" `JBList`s. This class handles
@@ -20,7 +24,7 @@ import org.jetbrains.annotations.*;
  * - Transferring focus to the component next to the last list
  *   in the sequence when the "tab" key is pressed while any of
  *   the lists has focus
- *
+ * <p>
  * For simplicity, all lists added to a list sequence must be
  * in single-selection mode.
  *
@@ -31,7 +35,7 @@ public final class JBListSequence<T> {
 	/**
 	 * The `JBList`s in this sequence.
 	 */
-	private List<JBList<T>> lists = new ArrayList<>();
+	private final List<JBList<T>> lists = new ArrayList<>();
 
 	/**
 	 * A reference to the list currently in focus.
@@ -41,7 +45,7 @@ public final class JBListSequence<T> {
 	/**
 	 * Listeners to selection changes in this sequence.
 	 */
-	private List<Consumer<T>> selectionListeners = new ArrayList<>();
+	private final List<Consumer<T>> selectionListeners = new ArrayList<>();
 
 	/**
 	 * Adds the given `JBList` to this sequence.

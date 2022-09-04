@@ -1,10 +1,12 @@
 package com.adacore.adaintellij.analysis.syntactic.structure;
 
-import com.intellij.ide.structureView.*;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiFile;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiStructureManager;
+import com.intellij.ide.structureView.StructureViewModel;
+import com.intellij.ide.structureView.TreeBasedStructureViewBuilder;
 import com.intellij.openapi.editor.Editor;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.analysis.syntactic.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Structure view builder for Ada files.
@@ -15,7 +17,7 @@ public final class AdaTreeBasedStructureViewBuilder extends TreeBasedStructureVi
 	 * The PSI file represented by the structure views built
 	 * by this builder.
 	 */
-	private AdaPsiFile file;
+	private final AdaPsiFile file;
 
 	/**
 	 * Constructs a new AdaTreeBasedStructureViewBuilder given

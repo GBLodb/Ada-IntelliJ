@@ -1,10 +1,11 @@
 package com.adacore.adaintellij;
 
-import java.net.URL;
-
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.URL;
 
 /**
  * Ada-IntelliJ plugin-wide resource manager.

@@ -1,11 +1,12 @@
 package com.adacore.adaintellij.editor;
 
-import com.intellij.openapi.editor.event.*;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.file.AdaFileType;
 import com.adacore.adaintellij.Utils;
+import com.adacore.adaintellij.file.AdaFileType;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Document listener for Ada source file documents.
@@ -45,11 +46,11 @@ public class AdaDocumentListener implements DocumentListener {
 	}
 
 	/**
-	 * Returns whether or not the given document event should be
+	 * Returns whether the given document event should be
 	 * handled.
 	 *
 	 * @param event The document event to test.
-	 * @return Whether or not the given event should be handled.
+	 * @return Whether the given event should be handled.
 	 */
 	private boolean shouldHandleEvent(@Nullable DocumentEvent event) {
 

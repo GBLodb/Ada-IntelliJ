@@ -1,10 +1,11 @@
 package com.adacore.adaintellij.analysis.syntactic.structure;
 
-import com.intellij.ide.structureView.*;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
+import com.intellij.ide.structureView.StructureViewModel;
+import com.intellij.ide.structureView.StructureViewModelBase;
+import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
 
 /**
  * Structure view model of an Ada file.
@@ -28,16 +29,16 @@ public final class AdaStructureViewModel extends StructureViewModelBase
 	 */
 	@NotNull
 	@Override
-	protected Class[] getSuitableClasses() {
+	protected Class<?>[] getSuitableClasses() {
 		return new Class[] { AdaPsiElement.class };
 	}
 
 	/**
-	 * Returns whether or not the given element is always a container
+	 * Returns whether the given element is always a container
 	 * that can be expanded to reveal a subtree of elements.
 	 *
 	 * @param element The element to test.
-	 * @return Whether or not the given element is always expandable.
+	 * @return Whether the given element is always expandable.
 	 */
 	@Override
 	public boolean isAlwaysShowsPlus(StructureViewTreeElement element) {
@@ -45,10 +46,10 @@ public final class AdaStructureViewModel extends StructureViewModelBase
 	}
 
 	/**
-	 * Returns whether or not the given element is always a leaf element.
+	 * Returns whether the given element is always a leaf element.
 	 *
 	 * @param element The element to test.
-	 * @return Whether or not the given element is always a leaf element.
+	 * @return Whether the given element is always a leaf element.
 	 */
 	@Override
 	public boolean isAlwaysLeaf(StructureViewTreeElement element) {

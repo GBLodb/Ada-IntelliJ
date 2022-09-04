@@ -1,27 +1,30 @@
 package com.adacore.adaintellij.analysis.syntactic;
 
+import com.adacore.adaintellij.lsp.AdaLSPDriverService;
+import com.adacore.adaintellij.lsp.AdaLSPServer;
+import com.adacore.adaintellij.lsp.LSPUtils;
+import com.adacore.adaintellij.misc.cache.CacheKey;
+import com.adacore.adaintellij.misc.cache.CacheResult;
+import com.adacore.adaintellij.misc.cache.Cacher;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
-import org.jetbrains.annotations.*;
-
 import org.eclipse.lsp4j.Location;
-
-import com.adacore.adaintellij.misc.cache.*;
-import com.adacore.adaintellij.lsp.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.adacore.adaintellij.Utils.*;
 
 /**
  * Ada AST node representing an element that can reference other elements.
- * Typically such an element is an Ada identifier. By nature, an element
+ * Typically, such an element is an Ada identifier. By nature, an element
  * of this class always has a name and a corresponding element identifying
  * it, that element being itself, which is why this class implements
  * `PsiNameIdentifierOwner` (which in turn extends `PsiNamedElement`).
- *
+ * <p>
  * For detailed information about the structure of ASTs built by the
  * Ada-IntelliJ Ada parser:
  * @see AdaParser
@@ -39,7 +42,7 @@ public final class AdaPsiReference extends AdaPsiElement
 	/**
 	 * The underlying tree node.
 	 */
-	private ASTNode node;
+	private final ASTNode node;
 
 	/**
 	 * Constructs a new AdaPsiReference given a tree node.
@@ -175,7 +178,7 @@ public final class AdaPsiReference extends AdaPsiElement
 
 		// Make the request and wait for the result
 
-		AdaLSPServer lspServer = AdaLSPDriver.getServer(getProject());
+		AdaLSPServer lspServer = AdaLSPDriverService.getServer(getProject());
 
 		if (lspServer == null) { return null; }
 
@@ -257,7 +260,7 @@ public final class AdaPsiReference extends AdaPsiElement
 	 */
 	@Override
 	public boolean isReferenceTo(@NotNull PsiElement element) {
-		return getText().toLowerCase().equals(element.getText().toLowerCase()) &&
+		return getText().equalsIgnoreCase(element.getText()) &&
 			AdaPsiElement.areEqual(resolveAdaReference(), element);
 	}
 
@@ -281,10 +284,10 @@ public final class AdaPsiReference extends AdaPsiElement
 	public boolean canNavigate() { return true; }
 
 	/**
-	 * Returns whether or not this element references itself,
+	 * Returns whether this element references itself,
 	 * i.e. if it is a declaration of any kind.
 	 *
-	 * @return Whether or not this element is a declaration.
+	 * @return Whether this element is a declaration.
 	 */
 	public boolean isDeclaration() { return isReferenceTo(this); }
 
@@ -295,7 +298,7 @@ public final class AdaPsiReference extends AdaPsiElement
 	 */
 	@Override
 	public String toString() {
-		return "AdaPsiReference(" + getElementType().toString() + ")";
+		return "AdaPsiReference(" + getElementType() + ")";
 	}
 
 }

@@ -1,8 +1,10 @@
 package com.adacore.adaintellij.lsp;
 
-import java.util.*;
-
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provider of request timeouts for the various LSP methods.

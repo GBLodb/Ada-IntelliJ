@@ -1,11 +1,13 @@
 package com.adacore.adaintellij.analysis.lexical;
 
-import java.util.*;
-
+import com.adacore.adaintellij.analysis.lexical.regex.LexerRegex;
+import com.adacore.adaintellij.analysis.lexical.regex.UnitRegex;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
-import com.adacore.adaintellij.analysis.lexical.regex.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.adacore.adaintellij.analysis.lexical.GPRFileTokenTypes.*;
 

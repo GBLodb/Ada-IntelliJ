@@ -1,7 +1,9 @@
 package com.adacore.adaintellij.misc.cache;
 
 import com.intellij.openapi.util.UserDataHolder;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A `UserDataHolder` variant that supports storing null values.
@@ -17,41 +19,6 @@ import org.jetbrains.annotations.*;
  * cannot be extended.
  */
 public interface Cacher extends UserDataHolder {
-
-	/**
-	 * Caches the given data with the given cache key.
-	 *
-	 * @param key The key representing the data to cache.
-	 * @param data The data to cache.
-	 * @param <T> The type of the data to cache.
-	 */
-	default <T> void cacheData(@NotNull CacheKey<T> key, @Nullable T data) {
-		cacheData(this, key, data);
-	}
-
-	/**
-	 * Clears the cached data for the given key.
-	 *
-	 * @param key The key of the cached data to clear.
-	 * @param <T> The type of cached data to clear.
-	 */
-	default <T> void clearCachedData(@NotNull CacheKey<T> key) {
-		clearCachedData(this, key);
-	}
-
-	/**
-	 * Returns the cached data for the given key as a cache
-	 * result.
-	 *
-	 * @param key The key of the cached data to get.
-	 * @param <T> The type of the cached data to get.
-	 * @return The cached data as a cache result.
-	 */
-	@Contract("_ -> new")
-	@NotNull
-	default <T> CacheResult<T> getCachedData(@NotNull CacheKey<T> key) {
-		return getCachedData(this, key);
-	}
 
 	/**
 	 * Caches the given data with the given cache key in the
@@ -109,6 +76,41 @@ public interface Cacher extends UserDataHolder {
 		return cacheData == null ?
 			new CacheResult<>() : new CacheResult<>(cacheData.data);
 
+	}
+
+	/**
+	 * Caches the given data with the given cache key.
+	 *
+	 * @param key The key representing the data to cache.
+	 * @param data The data to cache.
+	 * @param <T> The type of the data to cache.
+	 */
+	default <T> void cacheData(@NotNull CacheKey<T> key, @Nullable T data) {
+		cacheData(this, key, data);
+	}
+
+	/**
+	 * Clears the cached data for the given key.
+	 *
+	 * @param key The key of the cached data to clear.
+	 * @param <T> The type of cached data to clear.
+	 */
+	default <T> void clearCachedData(@NotNull CacheKey<T> key) {
+		clearCachedData(this, key);
+	}
+
+	/**
+	 * Returns the cached data for the given key as a cache
+	 * result.
+	 *
+	 * @param key The key of the cached data to get.
+	 * @param <T> The type of the cached data to get.
+	 * @return The cached data as a cache result.
+	 */
+	@Contract("_ -> new")
+	@NotNull
+	default <T> CacheResult<T> getCachedData(@NotNull CacheKey<T> key) {
+		return getCachedData(this, key);
 	}
 
 }

@@ -1,21 +1,19 @@
 package com.adacore.adaintellij.lsp.objects;
 
-import java.util.Map;
-
+import com.google.gson.annotations.JsonAdapter;
+import org.eclipse.lsp4j.jsonrpc.json.adapters.JsonElementTypeAdapter;
+import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.google.gson.annotations.JsonAdapter;
-
-import org.eclipse.lsp4j.jsonrpc.json.adapters.JsonElementTypeAdapter;
-import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
+import java.util.Map;
 
 /**
  * Class representation of the Ada-specific JSON settings object
  * included in `workspace/didChangeConfiguration` notifications.
- *
+ * <p>
  * Settings structure:
- *
+ * <p>
  * {
  *     "ada" : {
  *         "projectFile"       : "file:///path/to/projectFile",
@@ -30,40 +28,11 @@ import org.eclipse.lsp4j.jsonrpc.validation.NonNull;
 public final class AdaSettingsObject {
 
 	/**
-	 * Class representation of the "ada" JSON object.
-	 */
-	public class AdaObject {
-
-		/**
-		 * The "projectFile" property.
-		 */
-		private String projectFile;
-
-		/**
-		 * The "scenarioVariables" property.
-		 */
-		private Map<String, String> scenarioVariables;
-
-		/**
-		 * The "projectFile" property getter.
-		 */
-		@Nullable
-		public String getProjectFile() { return projectFile; }
-
-		/**
-		 * The "scenarioVariables" property getter.
-		 */
-		@Nullable
-		public Map<String, String> getScenarioVariables() { return scenarioVariables; }
-
-	}
-
-	/**
 	 * The "ada" property.
 	 */
 	@NonNull
 	@JsonAdapter(JsonElementTypeAdapter.Factory.class)
-	private AdaObject ada;
+	private final AdaObject ada;
 
 	/**
 	 * Constructs a new Ada settings object.
@@ -93,5 +62,34 @@ public final class AdaSettingsObject {
 	 */
 	@NotNull
 	public AdaObject getAda() { return ada; }
+
+	/**
+	 * Class representation of the "ada" JSON object.
+	 */
+	public class AdaObject {
+
+		/**
+		 * The "projectFile" property.
+		 */
+		private String projectFile;
+
+		/**
+		 * The "scenarioVariables" property.
+		 */
+		private Map<String, String> scenarioVariables;
+
+		/**
+		 * The "projectFile" property getter.
+		 */
+		@Nullable
+		public String getProjectFile() { return projectFile; }
+
+		/**
+		 * The "scenarioVariables" property getter.
+		 */
+		@Nullable
+		public Map<String, String> getScenarioVariables() { return scenarioVariables; }
+
+	}
 
 }

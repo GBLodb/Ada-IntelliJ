@@ -1,8 +1,7 @@
 package com.adacore.adaintellij.analysis.syntactic;
 
-import com.intellij.psi.tree.IFileElementType;
-
 import com.adacore.adaintellij.AdaLanguage;
+import com.intellij.psi.tree.IFileElementType;
 
 /**
  * Element type representing an Ada file.

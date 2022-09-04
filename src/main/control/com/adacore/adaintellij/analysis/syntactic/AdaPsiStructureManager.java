@@ -1,27 +1,27 @@
 package com.adacore.adaintellij.analysis.syntactic;
 
-import java.util.List;
-
+import com.adacore.adaintellij.Utils;
+import com.adacore.adaintellij.lsp.AdaLSPDriverService;
+import com.adacore.adaintellij.lsp.AdaLSPServer;
+import com.adacore.adaintellij.lsp.LSPUtils;
+import com.adacore.adaintellij.misc.cache.Marker;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import org.eclipse.lsp4j.DocumentSymbol;
 import org.jetbrains.annotations.NotNull;
 
-import org.eclipse.lsp4j.DocumentSymbol;
-
-import com.adacore.adaintellij.lsp.*;
-import com.adacore.adaintellij.misc.cache.Marker;
-import com.adacore.adaintellij.Utils;
+import java.util.List;
 
 import static com.adacore.adaintellij.analysis.syntactic.AdaPsiElement.AdaElementType;
 
 /**
  * Ada program structure manager.
- *
+ * <p>
  * Due to the way Ada source code is parsed by the Ada-IntelliJ
  * plugin, additional syntax information can only be added to the
  * PSI tree elements after the tree has been constructed.
- *
+ * <p>
  * This class provides an API that can be used to query additional
  * syntax information about a given PSI file from the ALS (Ada
  * Language Server) and patch the underlying PSI tree with the
@@ -66,8 +66,7 @@ public class AdaPsiStructureManager {
 
 		patchPsiFileIfMarked(
 			psiFile,
-			SYMBOLS_PATCH_MARKER,
-			() -> {
+				() -> {
 
 				Document    document    = Utils.getPsiFileDocument(psiFile);
 				VirtualFile virtualFile = Utils.getPsiFileVirtualFile(psiFile);
@@ -78,7 +77,7 @@ public class AdaPsiStructureManager {
 
 				// Make the request and wait for the result
 
-				AdaLSPServer lspServer = AdaLSPDriver.getServer(psiFile.getProject());
+				AdaLSPServer lspServer = AdaLSPDriverService.getServer(psiFile.getProject());
 
 				if (lspServer == null) { return; }
 
@@ -123,18 +122,16 @@ public class AdaPsiStructureManager {
 	 * with the given marker, then marks the file with that marker.
 	 *
 	 * @param psiFile The PSI file to check for the marker.
-	 * @param marker The marker to check in the given PSI file.
-	 * @param patch The patch to apply if the file is marked.
+	 * @param patch   The patch to apply if the file is marked.
 	 */
 	private static void patchPsiFileIfMarked(
 		@NotNull AdaPsiFile psiFile,
-		@NotNull Marker     marker,
 		@NotNull Runnable   patch
 	) {
 
 		// If the file is marked with the marker, then abort
 
-		if (psiFile.isMarked(marker)) { return; }
+		if (psiFile.isMarked(AdaPsiStructureManager.SYMBOLS_PATCH_MARKER)) { return; }
 
 		// Apply the patch
 
@@ -142,7 +139,7 @@ public class AdaPsiStructureManager {
 
 		// Mark the file with the marker
 
-		psiFile.mark(marker);
+		psiFile.mark(AdaPsiStructureManager.SYMBOLS_PATCH_MARKER);
 
 	}
 

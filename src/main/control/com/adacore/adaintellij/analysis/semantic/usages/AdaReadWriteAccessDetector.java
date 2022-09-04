@@ -1,10 +1,11 @@
 package com.adacore.adaintellij.analysis.semantic.usages;
 
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiReference;
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.analysis.syntactic.*;
 
 /**
  * Read/write access detector for Ada.
@@ -12,11 +13,11 @@ import com.adacore.adaintellij.analysis.syntactic.*;
 public final class AdaReadWriteAccessDetector extends ReadWriteAccessDetector {
 
 	/**
-	 * Returns whether or not the given element can be classified
+	 * Returns whether the given element can be classified
 	 * as a read and/or write access.
 	 *
 	 * @param element The element to test.
-	 * @return Whether or not the given element can be classified
+	 * @return Whether the given element can be classified
 	 *         as a read and/or write access.
 	 */
 	@Override
@@ -25,11 +26,11 @@ public final class AdaReadWriteAccessDetector extends ReadWriteAccessDetector {
 	}
 
 	/**
-	 * Returns whether or not the given element is a write access
+	 * Returns whether the given element is a write access
 	 * of a declaration.
 	 *
 	 * @param element The element to test.
-	 * @return Whether or not the given element is a write access
+	 * @return Whether the given element is a write access
 	 *         of a declaration.
 	 */
 	@Override

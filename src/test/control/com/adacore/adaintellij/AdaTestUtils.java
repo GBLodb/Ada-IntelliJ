@@ -1,6 +1,7 @@
 package com.adacore.adaintellij;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
 import java.net.URI;
 
 /**

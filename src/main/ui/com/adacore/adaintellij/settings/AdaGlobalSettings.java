@@ -1,14 +1,13 @@
 package com.adacore.adaintellij.settings;
 
-import javax.swing.*;
-
+import com.adacore.adaintellij.UIUtils;
+import com.adacore.adaintellij.build.GPRbuildManagerService;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.build.GPRbuildManager;
-import com.adacore.adaintellij.UIUtils;
+import javax.swing.*;
 
 /**
  * Global IDE settings UI for Ada development.
@@ -71,7 +70,7 @@ public final class AdaGlobalSettings implements ValidatableConfigurable {
 
 		String path = gprbuildPathField.getText();
 
-		GPRbuildManager.setGprBuildPath(path);
+		GPRbuildManagerService.setGprBuildPath(path);
 		lastSetGprbuildPath = path;
 
 	}
@@ -82,7 +81,7 @@ public final class AdaGlobalSettings implements ValidatableConfigurable {
 	@Override
 	public void reset() {
 
-		String gprbuildPath = GPRbuildManager.getGprbuildPath();
+		String gprbuildPath = GPRbuildManagerService.getGprbuildPath();
 
 		gprbuildPathField.setText(gprbuildPath);
 		lastSetGprbuildPath = gprbuildPath;

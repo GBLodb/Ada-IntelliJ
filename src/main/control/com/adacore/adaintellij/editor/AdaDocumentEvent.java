@@ -4,8 +4,8 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 
 public class AdaDocumentEvent {
 
-    private DocumentEvent   documentEvent;
-    private String          previousContent;
+    private final DocumentEvent   documentEvent;
+    private final String          previousContent;
 
     public AdaDocumentEvent(DocumentEvent doc, String previousContent)
     {

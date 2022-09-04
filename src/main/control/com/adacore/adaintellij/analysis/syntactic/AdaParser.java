@@ -1,27 +1,29 @@
 package com.adacore.adaintellij.analysis.syntactic;
 
-import com.intellij.lang.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Parser for the Ada language.
- *
+ * <p>
  * The Ada-IntelliJ plugin does not implement a full-fledged Ada parser, and
  * instead relies on the Ada Language Server (ALS) to provide all sorts of
  * semantic features such as error reporting/highlighting, reference search,
  * code completion, code navigation, etc.
- *
+ * <p>
  * However, these operations still need to go through an AST in the format
  * defined by the IntelliJ platform, which consists of the various classes
  * from the the PSI family.
- *
+ * <p>
  * To address this, the Ada-IntelliJ plugin provides some sort of dummy parser
  * for Ada files, that simply outputs an AST in the form of a flat tree of nodes
  * that directly map to the tokens produced by the Ada lexer.
- *
+ * <p>
  * Consider the following example:
- *
+ * <p>
  *       Code            Lexer Tokens                   Parsed PSI Tree
  *  ===========================================================================
  *  ...                      ...       -------             ...---|
@@ -50,7 +52,7 @@ import org.jetbrains.annotations.NotNull;
  *                       END_KEYWORD   -------   AdaPsiElement---|
  *                        SEMICOLON    -------   AdaPsiElement---|
  *                           ...       -------             ...---|
- *
+ * <p>
  * As this example demonstrates, the final abstract trees returned by this
  * parser are not ASTs in the proper, traditional sense of the word, namely:
  *  - They maintain ALL elements of the source code, including whitespaces,
@@ -59,16 +61,16 @@ import org.jetbrains.annotations.NotNull;
  * Their only purpose is to act as placeholders that enable the Ada-IntelliJ
  * plugin to override operations defined on their nodes and "outsource" the
  * actual work required for those operations to the ALS.
- *
+ * <p>
  * Note that, as an intermediate step, before building the final AST consisting
  * of PSI elements, the PSI builder builds a tree consisting of instances of the
  * `ASTNode` interface, which counter-intuitively is not a proper AST either.
  * The underlying node of a PSI element is accessible through the `getNode`
  * method.
- *
- * See this diagram from the IntelliJ platform SDK tutorial:
- * https://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/img/PsiBuilder.gif
- *
+ * <p>
+ * See this diagram from the Int<a href="elliJ">platform SDK tutorial:
+ * https://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_lan</a>guage_support/img/PsiBuilder.gif
+ * <p>
  * The intermediate tree does not necessarily have a one-to-one mapping to the
  * final PSI tree. In fact, for every "leaf" marker (except for whitespace and
  * comments), the PSI builder seems to add to the intermediate tree a
@@ -78,7 +80,7 @@ import org.jetbrains.annotations.NotNull;
  * class implementing `PsiElement`. This means that, unlike what is shown in the
  * example above, the actual final parsed PSI tree has a depth of 2. Here is an
  * example diagram with arrows illustrating references:
- *
+ * <p>
  *                                  AdaPsiFile
  *                                   ^ ^  ^ ^
  *                                   | |  | |
@@ -90,7 +92,7 @@ import org.jetbrains.annotations.NotNull;
  *             ^                ^                ^               ^
  *             |                |                |               |
  *         PsiElement      PsiElement      PsiElement      PsiElement
- *
+ * <p>
  * As you can see, Ada PSI elements do not hold references to their "child"
  * nodes since they are implemented as leaf nodes.
  * It is important to keep this structure in mind as the IntelliJ platform API
@@ -133,7 +135,7 @@ public final class AdaParser implements PsiParser {
 
 		// `tokenType != null` should be guaranteed to be false
 		// by the preceding check `!builder.eof()`, but we check
-		// nullability anyways just to be safe
+		// nullability anyway just to be safe
 		while (!builder.eof() && tokenType != null) {
 
 			// Advance to the next token
@@ -158,7 +160,7 @@ public final class AdaParser implements PsiParser {
 
 		}
 
-		// The end of the source file was reached but we still
+		// The end of the source file was reached, but we still
 		// have a set marker that does not correspond to any token,
 		// so drop it
 

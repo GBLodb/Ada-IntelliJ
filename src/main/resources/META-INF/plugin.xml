@@ -1,20 +1,20 @@
 <idea-plugin>
 
-	<!-- Plugin metadata -->
+    <!-- Plugin metadata -->
 
-	<id>com.adacore.Ada-IntelliJ</id>
-	<name>Ada</name>
-	<vendor email="jetbrains@adacore.com" url="https://www.adacore.com">AdaCore</vendor>
+    <id>com.adacore.Ada-IntelliJ</id>
+    <name>Ada</name>
+    <vendor email="jetbrains@adacore.com" url="https://www.adacore.com">AdaCore</vendor>
 
-	<idea-version since-build="201.3803.71"/>
+    <idea-version since-build="202.6397"/>
 
-	<description><![CDATA[
+    <description><![CDATA[
 		Support for the Ada and SPARK languages, and GPR project files.
 	]]></description>
 
-	<!-- Change-notes -->
+    <!-- Change-notes -->
 
-	<change-notes><![CDATA[
+    <change-notes><![CDATA[
 		<strong>0.6-dev</strong>
 		<ul>
 			<li>Updated "until-build" IDEA version to support future versions of IDEs</li>
@@ -25,136 +25,174 @@
 		</ul>
 	]]></change-notes>
 
-	<!-- Dependencies -->
+    <!-- Dependencies -->
 
-	<!-- Allows compatibility with all IntelliJ IDEs -->
-	<!-- See https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
-	<depends>com.intellij.modules.lang</depends>
+    <!-- Allows compatibility with all IntelliJ IDEs -->
+    <!-- See https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html -->
+    <depends>com.intellij.modules.lang</depends>
 
-	<!-- Application-wide components -->
+    <!-- Application-wide components -->
 
-	<application-components>
+    <application-components>
 
-		<!-- GPRbuild manager component -->
-		<component>
-			<implementation-class>com.adacore.adaintellij.build.GPRbuildManager</implementation-class>
-		</component>
+        <!-- GPRbuild manager component -->
+        <component>
+            <implementation-class>com.adacore.adaintellij.build.GPRbuildManagerService</implementation-class>
+        </component>
 
-	</application-components>
+    </application-components>
 
-	<!-- Project-wide components -->
+    <!-- Project-wide components -->
 
-	<project-components>
+    <project-components>
 
-		<!-- Ada project component -->
-		<component>
-			<implementation-class>com.adacore.adaintellij.project.AdaProject</implementation-class>
-		</component>
+        <!-- Ada project component -->
+        <component>
+            <implementation-class>com.adacore.adaintellij.project.AdaProjectService</implementation-class>
+        </component>
 
-		<!-- GPR file manager component -->
-		<component>
-			<implementation-class>com.adacore.adaintellij.project.GPRFileManager</implementation-class>
-		</component>
-		<!-- GPRbuild configuration manager component -->
-		<component>
-			<implementation-class>com.adacore.adaintellij.build.GPRbuildConfigurationManager</implementation-class>
-		</component>
+        <!-- GPR file manager component -->
+        <component>
+            <implementation-class>com.adacore.adaintellij.project.GPRFileManagerService</implementation-class>
+        </component>
+        <!-- GPRbuild configuration manager component -->
+        <component>
+            <implementation-class>com.adacore.adaintellij.build.GPRbuildConfigurationManagerService
+            </implementation-class>
+        </component>
 
-		<!-- LSP driver component -->
-		<component>
-			<implementation-class>com.adacore.adaintellij.lsp.AdaLSPDriver</implementation-class>
-		</component>
+        <!-- LSP driver component -->
+        <component>
+            <implementation-class>com.adacore.adaintellij.lsp.AdaLSPDriverService</implementation-class>
+        </component>
 
-	</project-components>
+    </project-components>
 
-	<!-- Platform extensions -->
+    <!-- Platform extensions -->
 
-	<extensions defaultExtensionNs="com.intellij">
+    <extensions defaultExtensionNs="com.intellij">
 
-		<!-- Ada global settings -->
-		<applicationConfigurable instance="com.adacore.adaintellij.settings.AdaGlobalSettings" groupId="language"/>
+        <!-- Ada global settings -->
+        <applicationConfigurable instance="com.adacore.adaintellij.settings.AdaGlobalSettings" groupId="language"/>
 
-		<!-- Ada file type factory -->
-		<fileTypeFactory implementation="com.adacore.adaintellij.file.AdaFileTypeFactory"/>
+        <!-- Register file types -->
+        <fileType
+                name="Ada Body File"
+                implementationClass="com.adacore.adaintellij.file.AdaBodyFileType"
+                fieldName="INSTANCE"
+                language="Ada"
+                extensions="ada"
+        />
+        <fileType
+                name="Ada Specification File"
+                implementationClass="com.adacore.adaintellij.file.AdaSpecFileType"
+                fieldName="INSTANCE"
+                language="Ada"
+                extensions="ads"
+        />
+        <fileType
+                name="Ada GPR File"
+                implementationClass="com.adacore.adaintellij.file.GPRFileType"
+                fieldName="INSTANCE"
+                language="Ada"
+                extensions="gpr"
+        />
 
-		<!-- Ada module builder -->
-		<moduleBuilder builderClass="com.adacore.adaintellij.project.module.AdaModuleBuilder" id="ADA_MODULE_BUILDER" order="first"/>
-		<!-- Ada module type -->
-		<moduleType implementationClass="com.adacore.adaintellij.project.module.AdaModuleType" id="ADA_MODULE_TYPE"/>
+        <!-- Register application service -->
+        <applicationService
+                serviceImplementation="com.adacore.adaintellij.build.GPRbuildManagerService"
+        />
 
-		<!-- Ada syntax highligher factory -->
-		<lang.syntaxHighlighterFactory language="Ada" implementationClass="com.adacore.adaintellij.analysis.lexical.AdaSyntaxHighlighterFactory"/>
-		<!-- GPR file syntax highligher factory -->
-		<lang.syntaxHighlighterFactory language="GPR File" implementationClass="com.adacore.adaintellij.analysis.lexical.GPRFileSyntaxHighlighterFactory"/>
+        <!-- Ada module builder -->
+        <moduleBuilder builderClass="com.adacore.adaintellij.project.module.AdaModuleBuilder" id="ADA_MODULE_BUILDER"
+                       order="first"/>
+        <!-- Ada module type -->
+        <moduleType implementationClass="com.adacore.adaintellij.project.module.AdaModuleType" id="ADA_MODULE_TYPE"/>
 
-		<!-- Ada parser definition -->
-		<lang.parserDefinition language="Ada" implementationClass="com.adacore.adaintellij.analysis.syntactic.AdaParserDefinition"/>
-		<!-- Ada find-usages provider -->
-		<lang.findUsagesProvider language="Ada" implementationClass="com.adacore.adaintellij.analysis.semantic.usages.AdaFindUsagesProvider"/>
-		<!-- Ada find-usages handler factory -->
-		<findUsagesHandlerFactory implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaFindUsagesHandlerFactory"/>
-		<!-- Ada read/write access detector -->
-		<readWriteAccessDetector implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaReadWriteAccessDetector"/>
+        <!-- Ada syntax highligher factory -->
+        <lang.syntaxHighlighterFactory language="Ada"
+                                       implementationClass="com.adacore.adaintellij.analysis.lexical.AdaSyntaxHighlighterFactory"/>
+        <!-- GPR file syntax highligher factory -->
+        <lang.syntaxHighlighterFactory language="GPR File"
+                                       implementationClass="com.adacore.adaintellij.analysis.lexical.GPRFileSyntaxHighlighterFactory"/>
 
-		<completion.contributor
-			language="Ada"
-			id="com.adacore.adaintellij.analysis.semantic.completion.AdaCompletionContributor"
-			implementationClass="com.adacore.adaintellij.analysis.semantic.completion.AdaCompletionContributor"/>
+        <!-- Ada parser definition -->
+        <lang.parserDefinition language="Ada"
+                               implementationClass="com.adacore.adaintellij.analysis.syntactic.AdaParserDefinition"/>
+        <!-- Ada find-usages provider -->
+        <lang.findUsagesProvider language="Ada"
+                                 implementationClass="com.adacore.adaintellij.analysis.semantic.usages.AdaFindUsagesProvider"/>
+        <!-- Ada find-usages handler factory -->
+        <findUsagesHandlerFactory
+                implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaFindUsagesHandlerFactory"/>
+        <!-- Ada read/write access detector -->
+        <readWriteAccessDetector
+                implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaReadWriteAccessDetector"/>
 
-		<!-- Ada structure view factory -->
-		<lang.psiStructureViewFactory language="Ada" implementationClass="com.adacore.adaintellij.analysis.syntactic.structure.AdaStructureViewFactory"/>
-		<!-- Ada code annotator -->
-		<externalAnnotator
-			id="com.adacore.adaintellij.analysis.syntactic.diagnostics.AdaAnnotator"
-			language="Ada"
-			implementationClass="com.adacore.adaintellij.analysis.syntactic.diagnostics.AdaAnnotator"
-		/>
+        <completion.contributor
+                language="Ada"
+                id="com.adacore.adaintellij.analysis.semantic.completion.AdaCompletionContributor"
+                implementationClass="com.adacore.adaintellij.analysis.semantic.completion.AdaCompletionContributor"/>
 
-		<!-- Ada names validator -->
-		<lang.namesValidator language="Ada" implementationClass="com.adacore.adaintellij.analysis.lexical.AdaNamesValidator"/>
-		<!-- Ada PSI element rename processor -->
-		<renamePsiElementProcessor implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaRenamePsiElementProcessor"/>
-		<!-- Ada refactoring support provider -->
-		<lang.refactoringSupport language="Ada" implementationClass="com.adacore.adaintellij.analysis.semantic.usages.AdaRefactoringSupportProvider"/>
+        <!-- Ada structure view factory -->
+        <lang.psiStructureViewFactory language="Ada"
+                                      implementationClass="com.adacore.adaintellij.analysis.syntactic.structure.AdaStructureViewFactory"/>
+        <!-- Ada code annotator -->
+        <externalAnnotator
+                id="com.adacore.adaintellij.analysis.syntactic.diagnostics.AdaAnnotator"
+                language="Ada"
+                implementationClass="com.adacore.adaintellij.analysis.syntactic.diagnostics.AdaAnnotator"
+        />
 
-		<!-- Ada code commenter -->
-		<lang.commenter language="Ada" implementationClass="com.adacore.adaintellij.misc.AdaCommenter"/>
+        <!-- Ada names validator -->
+        <lang.namesValidator language="Ada"
+                             implementationClass="com.adacore.adaintellij.analysis.lexical.AdaNamesValidator"/>
+        <!-- Ada PSI element rename processor -->
+        <renamePsiElementProcessor
+                implementation="com.adacore.adaintellij.analysis.semantic.usages.AdaRenamePsiElementProcessor"/>
+        <!-- Ada refactoring support provider -->
+        <lang.refactoringSupport language="Ada"
+                                 implementationClass="com.adacore.adaintellij.analysis.semantic.usages.AdaRefactoringSupportProvider"/>
 
-		<lang.foldingBuilder
-			implementationClass="com.adacore.adaintellij.misc.AdaFoldingBuilder"
-			language="Ada"
-			id="com.adacore.adaintellij.misc.AdaFoldingBuilder" />
+        <!-- Ada code commenter -->
+        <lang.commenter language="Ada" implementationClass="com.adacore.adaintellij.misc.AdaCommenter"/>
 
-		<lang.quoteHandler
-			implementationClass="com.adacore.adaintellij.misc.AdaSpeechMarkHandler"
-			language="Ada"
-			id="com.adacore.adaintellij.misc.AdaSpeechMarkHandler" />
+        <lang.foldingBuilder
+                implementationClass="com.adacore.adaintellij.misc.AdaFoldingBuilder"
+                language="Ada"
+                id="com.adacore.adaintellij.misc.AdaFoldingBuilder"/>
 
-		<backspaceHandlerDelegate
-			implementation="com.adacore.adaintellij.misc.AdaBackspaceHandler"
-			id="com.adacore.adaintellij.misc.AdaBackspaceHandler" />
+        <lang.quoteHandler
+                implementationClass="com.adacore.adaintellij.misc.AdaSpeechMarkHandler"
+                language="Ada"
+                id="com.adacore.adaintellij.misc.AdaSpeechMarkHandler"/>
 
-		<lang.braceMatcher
-			implementationClass="com.adacore.adaintellij.misc.AdaBraceMatcher"
-			language="Ada"
-			id="com.adacore.adaintellij.misc.AdaBraceMatcher" />
+        <backspaceHandlerDelegate
+                implementation="com.adacore.adaintellij.misc.AdaBackspaceHandler"
+                id="com.adacore.adaintellij.misc.AdaBackspaceHandler"/>
 
-		<!-- GPRbuild run configuration type -->
-		<configurationType implementation="com.adacore.adaintellij.build.GPRbuildConfigurationType"/>
-		<!-- GPRbuild configuration tool window -->
-		<toolWindow id="GPRbuild" anchor="left" secondary="false" icon="/actions/compile.svg" factoryClass="com.adacore.adaintellij.build.GPRbuildConfigurationToolWindowFactory"/>
+        <lang.braceMatcher
+                implementationClass="com.adacore.adaintellij.misc.AdaBraceMatcher"
+                language="Ada"
+                id="com.adacore.adaintellij.misc.AdaBraceMatcher"/>
 
-	</extensions>
+        <!-- GPRbuild run configuration type -->
+        <configurationType implementation="com.adacore.adaintellij.build.GPRbuildConfigurationType"/>
+        <!-- GPRbuild configuration tool window -->
+        <toolWindow id="GPRbuild" anchor="left" secondary="false" icon="/actions/compile.svg"
+                    factoryClass="com.adacore.adaintellij.build.GPRbuildConfigurationToolWindowFactory"/>
 
-	<!-- Plugin actions -->
+    </extensions>
 
-	<actions>
-		<group text="Ada">
-			<add-to-group group-id="MainMenu" anchor="after" relative-to-action="RefactoringMenu"/>
-			<action class="com.adacore.adaintellij.actions.ProjectSettingsAction" text="Project Settings">
-				<keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
-			</action>
-		</group>
-	</actions>
+    <!-- Plugin actions -->
+
+    <actions>
+        <group text="Ada">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="RefactoringMenu"/>
+            <action class="com.adacore.adaintellij.actions.ProjectSettingsAction" text="Project Settings">
+                <keyboard-shortcut first-keystroke="control alt A" keymap="$default"/>
+            </action>
+        </group>
+    </actions>
 
 </idea-plugin>

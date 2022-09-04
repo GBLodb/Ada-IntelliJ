@@ -1,15 +1,14 @@
 package com.adacore.adaintellij.build;
 
-import javax.swing.*;
-
+import com.adacore.adaintellij.AdaIntelliJUI;
+import com.adacore.adaintellij.UIUtils;
 import com.intellij.execution.RunManagerListener;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.UIUtils;
-import com.adacore.adaintellij.AdaIntelliJUI;
+import javax.swing.*;
 
 /**
  * GPRbuild configuration tool window.
@@ -32,13 +31,13 @@ public final class GPRbuildConfigurationToolWindow extends AdaIntelliJUI {
 	/**
 	 * External UI components.
 	 */
-	private GPRbuildConfigurationEditor configurationEditor;
+	private final GPRbuildConfigurationEditor configurationEditor;
 
 	/**
 	 * The GPRbuild configuration manager project component of this
 	 * view's project.
 	 */
-	private GPRbuildConfigurationManager gprbuildConfigurationManager;
+	private final GPRbuildConfigurationManagerService gprbuildConfigurationManagerService;
 
 	/**
 	 * Constructs a new GPRbuildConfigurationToolWindow given a project.
@@ -78,15 +77,15 @@ public final class GPRbuildConfigurationToolWindow extends AdaIntelliJUI {
 		// add a listener to reset configuration editor view
 		// on configuration selection change
 
-		gprbuildConfigurationManager = GPRbuildConfigurationManager.getInstance(project);
+		gprbuildConfigurationManagerService = GPRbuildConfigurationManagerService.getInstance(project);
 
-		gprbuildConfigurationManager.addRunManagerListener(new RunManagerListener() {
+		gprbuildConfigurationManagerService.addRunManagerListener(new RunManagerListener() {
 
 			/**
 			 * Called when a different configuration is selected.
 			 */
 			@Override
-			public void runConfigurationSelected() { resetConfigurationEditor(); }
+			public void runConfigurationSelected(RunnerAndConfigurationSettings settings) { resetConfigurationEditor(); }
 
 			/**
 			 * Called when a configuration is changed.
@@ -97,7 +96,7 @@ public final class GPRbuildConfigurationToolWindow extends AdaIntelliJUI {
 			public void runConfigurationChanged(@NotNull RunnerAndConfigurationSettings settings) {
 
 				if (settings.getConfiguration().equals(
-					gprbuildConfigurationManager.getSelectedConfiguration()))
+					gprbuildConfigurationManagerService.getSelectedConfiguration()))
 				{
 					resetConfigurationEditor();
 				}
@@ -116,7 +115,7 @@ public final class GPRbuildConfigurationToolWindow extends AdaIntelliJUI {
 		applyButton.addActionListener(actionEvent -> {
 
 			GPRbuildConfiguration configuration =
-				gprbuildConfigurationManager.getSelectedConfiguration();
+				gprbuildConfigurationManagerService.getSelectedConfiguration();
 
 			if (configuration == null) { return; }
 
@@ -142,7 +141,7 @@ public final class GPRbuildConfigurationToolWindow extends AdaIntelliJUI {
 	private void resetConfigurationEditor() {
 
 		GPRbuildConfiguration configuration =
-			gprbuildConfigurationManager.getSelectedConfiguration();
+			gprbuildConfigurationManagerService.getSelectedConfiguration();
 
 		if (configuration == null) { return; }
 

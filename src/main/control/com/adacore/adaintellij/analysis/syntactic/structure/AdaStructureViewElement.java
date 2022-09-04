@@ -1,14 +1,16 @@
 package com.adacore.adaintellij.analysis.syntactic.structure;
 
-import java.util.stream.Stream;
-
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiFile;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiReference;
 import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ide.util.treeView.smartTree.*;
+import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
+import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
 import org.jetbrains.annotations.NotNull;
 
-import com.adacore.adaintellij.analysis.syntactic.*;
+import java.util.stream.Stream;
 
 import static com.adacore.adaintellij.analysis.syntactic.AdaPsiElement.AdaElementType;
 
@@ -20,7 +22,7 @@ public final class AdaStructureViewElement implements StructureViewTreeElement, 
 	/**
 	 * The PSI element that this structure view element represents.
 	 */
-	private NavigatablePsiElement element;
+	private final NavigatablePsiElement element;
 
 	/**
 	 * Constructs a new AdaStructureViewElement given a PSI

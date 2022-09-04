@@ -1,20 +1,20 @@
 package com.adacore.adaintellij.analysis.lexical;
 
-import java.net.URI;
-import java.util.*;
-
+import com.adacore.adaintellij.AdaTestUtils;
 import org.junit.jupiter.api.Test;
 
-import com.adacore.adaintellij.AdaTestUtils;
+import java.net.URI;
+import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * JUnit test class for the AdaLexer class.
  */
 final class AdaLexerTest {
 
-	private Class classObject = getClass();
+	private final Class<?> classObject = getClass();
 
 	/**
 	 * Asserts that the token sequence returned by an AdaLexer analysing

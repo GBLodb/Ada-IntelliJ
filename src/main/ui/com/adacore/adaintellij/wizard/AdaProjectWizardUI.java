@@ -1,17 +1,22 @@
 package com.adacore.adaintellij.wizard;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import javax.swing.*;
-
-import com.intellij.ui.components.*;
-import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.misc.*;
+import com.adacore.adaintellij.AdaIntelliJUI;
+import com.adacore.adaintellij.Icons;
+import com.adacore.adaintellij.UIUtils;
+import com.adacore.adaintellij.misc.IndentedIconedListCellRenderer;
+import com.adacore.adaintellij.misc.JBListSequence;
 import com.adacore.adaintellij.project.template.ProjectTemplateDescriptor;
-import com.adacore.adaintellij.*;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor.*;
 
@@ -36,7 +41,7 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 	/**
 	 * The sequence of lists of project templates.
 	 */
-	private JBListSequence<ProjectTemplateDescriptor>
+	private final JBListSequence<ProjectTemplateDescriptor>
 		templateListSequence = new JBListSequence<>();
 
 	/**
@@ -113,7 +118,7 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 
 		});
 
-		// Add an empty panel to fill the rest of the space
+		// Add an empty panel to fill rest of the space
 
 		gridConstraints.weighty = 1.0;
 
@@ -144,11 +149,11 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 	public JComponent getUIRoot() { return rootPanel; }
 
 	/**
-	 * Returns whether or not the wizard state is valid,
+	 * Returns whether the wizard state is valid,
 	 * which indicates that the wizard is ready to be
 	 * applied.
 	 *
-	 * @return Whether or not the wizard state is valid.
+	 * @return Whether the wizard state is valid.
 	 */
 	public boolean isValid() {
 		return templateListSequence.getSelection() != null &&
@@ -211,8 +216,8 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 			TemplateVariableTextField.class,
 			variableTextField -> {
 
-				if ("project_name".equals(
-					variableTextField.variableName.toLowerCase()))
+				if ("project_name".equalsIgnoreCase(
+						variableTextField.variableName))
 				{
 					nameBuilder.append(variableTextField.getText());
 					return true;
@@ -243,8 +248,8 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 			TemplateVariableTextField.class,
 			variableTextField -> {
 
-				if ("project_name".equals(
-					variableTextField.variableName.toLowerCase()))
+				if ("project_name".equalsIgnoreCase(
+						variableTextField.variableName))
 				{
 					variableTextField.setText(name);
 					return true;
@@ -287,7 +292,7 @@ public final class AdaProjectWizardUI extends AdaIntelliJUI {
 		}
 
 		// Otherwise, for each variable, add a text field or a
-		// combo-box, depending on whether or not the variable
+		// combo-box, depending on whether the variable
 		// is one with a finite set of options
 
 		else {

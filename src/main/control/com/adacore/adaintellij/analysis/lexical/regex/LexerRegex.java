@@ -1,13 +1,13 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Object-Based Regular Expression specifically designed to be used
  * by a Lexical Analyser.
  * The main feature of this lexer-targeting regex class is the
  * `advanced` method which allows matching a sequence of characters
- * incrementally, filtering out non matching regexes along the way.
+ * incrementally, filtering out non-matching regexes along the way.
  * Any implementing class must be immutable by design. This allows
  * regexes to be reused when defining complex regexes.
  */
@@ -35,8 +35,7 @@ public abstract class LexerRegex {
 	}
 
 	/**
-	 * Returns whether or not this regex is nullable, i.e. whether
-	 * or not it accepts the empty string.
+	 * Returns whether this regex is nullable, i.e. whether it accepts the empty string.
 	 * Not to be confused with the possibility of a variable being null,
 	 * as can be indicated with JetBrains' @Nullable annotation.
 	 *
@@ -60,7 +59,7 @@ public abstract class LexerRegex {
 	 * If a regex `r` matches a sequence of characters `(c_1, ... c_n)`,
 	 * then the following expression is guaranteed to run without any
 	 * of the calls to advanced returning a null regex:
-	 *
+	 * <p>
 	 *                       r.advanced(c_1)
 	 *                        .advanced(c_2)
 	 *                              .
@@ -68,11 +67,11 @@ public abstract class LexerRegex {
 	 *                              .
 	 *                        .advanced(c_n-1)
 	 *                        .advanced(c_n)
-	 *
+	 * <p>
 	 * Inversely, if a regex `r` does not match any sequence of
 	 * characters starting with a character `c`, then the following
 	 * expression is guaranteed to return null:
-	 *
+	 * <p>
 	 *                        r.advanced(c)
 	 *
 	 * @param character The character by which to advance this regex.

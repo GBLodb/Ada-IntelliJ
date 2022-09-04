@@ -1,26 +1,28 @@
 package com.adacore.adaintellij.lsp;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.function.*;
-import java.util.stream.*;
-
 import com.adacore.adaintellij.editor.AdaDocumentEvent;
-import com.intellij.notification.*;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.progress.*;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.*;
-
-import org.eclipse.lsp4j.*;
-import org.eclipse.lsp4j.Range;
-import org.eclipse.lsp4j.jsonrpc.messages.Either;
-import org.eclipse.lsp4j.services.LanguageServer;
-
 import com.adacore.adaintellij.file.AdaFileType;
 import com.adacore.adaintellij.lsp.objects.AdaSettingsObject;
 import com.adacore.adaintellij.notifications.AdaIJNotification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.eclipse.lsp4j.*;
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
+import org.eclipse.lsp4j.services.LanguageServer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.adacore.adaintellij.Utils.*;
 
@@ -32,11 +34,6 @@ import static com.adacore.adaintellij.Utils.*;
 public final class AdaLSPServer {
 
 	/**
-	 * Class-wide logger for the AdaLSPServer class.
-	 */
-	private static Logger LOGGER = Logger.getInstance(AdaLSPServer.class);
-
-	/**
 	 * Empty result lists returned by servers.
 	 */
 	private static final List<TextEdit>       EMPTY_TEXT_EDIT_LIST       = Collections.emptyList();
@@ -44,16 +41,19 @@ public final class AdaLSPServer {
 	private static final List<Location>       EMPTY_LOCATION_LIST        = Collections.emptyList();
 	private static final List<DocumentSymbol> EMPTY_DOCUMENT_SYMBOL_LIST = Collections.emptyList();
 	private static final List<FoldingRange>   EMPTY_FOLDING_RANGE_LIST   = Collections.emptyList();
-
+	/**
+	 * Class-wide logger for the AdaLSPServer class.
+	 */
+	private static final Logger LOGGER = Logger.getInstance(AdaLSPServer.class);
 	/**
 	 * The LSP driver to which this server belongs.
 	 */
-	private AdaLSPDriver driver;
+	private final AdaLSPDriverService driverService;
 
 	/**
 	 * The actual LSP4J server represented by this server interface.
 	 */
-	private LanguageServer server;
+	private final LanguageServer server;
 
 	/**
 	 * Server capabilities.
@@ -62,7 +62,7 @@ public final class AdaLSPServer {
 	private TextDocumentSyncOptions serverSyncPolicy;
 
 	/**
-	 * Whether or not initialization request and notification have
+	 * Whether initialization request and notification have
 	 * already been sent.
 	 */
 	private boolean initializeRequestSent       = false;
@@ -76,17 +76,17 @@ public final class AdaLSPServer {
 	/**
 	 * The set of open files in the IDE.
 	 */
-	private Set<String> openFiles = new HashSet<>();
+	private final Set<String> openFiles = new HashSet<>();
 
 	/**
 	 * Constructs a new AdaLSPServer given its driver and the corresponding
 	 * internal LSP4J server.
 	 *
-	 * @param driver The driver to attach to this server.
+	 * @param driverService The driver to attach to this server.
 	 * @param server The internal server corresponding to this server.
 	 */
-	AdaLSPServer(@NotNull AdaLSPDriver driver, @NotNull LanguageServer server) {
-		this.driver = driver;
+	AdaLSPServer(@NotNull AdaLSPDriverService driverService, @NotNull LanguageServer server) {
+		this.driverService = driverService;
 		this.server = server;
 	}
 
@@ -125,7 +125,7 @@ public final class AdaLSPServer {
 			change            = serverSyncPolicy.getChange();
 			willSave          = serverSyncPolicy.getWillSave();
 			willSaveWaitUntil = serverSyncPolicy.getWillSaveWaitUntil();
-			save              = serverSyncPolicy.getSave();
+			save              = serverSyncPolicy.getSave().getRight();
 
 		} else if (syncOptions.isLeft()) {
 
@@ -199,7 +199,7 @@ public final class AdaLSPServer {
 				// the end of the next check-cancel interval
 
 				result = requestFuture.get(
-					AdaLSPDriver.CHECK_CANCELED_INTERVAL,
+					AdaLSPDriverService.CHECK_CANCELED_INTERVAL,
 					TimeUnit.MILLISECONDS
 				);
 
@@ -214,7 +214,7 @@ public final class AdaLSPServer {
 				// request timeout then check if the operation was
 				// canceled, and if it was then break
 
-				requestTimeout -= AdaLSPDriver.CHECK_CANCELED_INTERVAL;
+				requestTimeout -= AdaLSPDriverService.CHECK_CANCELED_INTERVAL;
 
 				try {
 					ProgressManager.checkCanceled();
@@ -235,7 +235,7 @@ public final class AdaLSPServer {
 				// If the number of failed requests reaches the threshold defined in
 				// the driver, then notify the user and shut down the server
 
-				if (failureCount == AdaLSPDriver.FAILURE_COUNT_THRESHOLD) {
+				if (failureCount == AdaLSPDriverService.FAILURE_COUNT_THRESHOLD) {
 
 					Notifications.Bus.notify(new AdaIJNotification(
 						"Connection to Ada Language Server unreliable",
@@ -245,7 +245,7 @@ public final class AdaLSPServer {
 						NotificationType.ERROR
 					));
 
-					driver.shutDownServer();
+					driverService.shutDownServer();
 
 				}
 
@@ -473,10 +473,10 @@ public final class AdaLSPServer {
 		// Will never execute
 		else { return; }
 
-		List<TextDocumentContentChangeEvent> changeEvents = Arrays.asList(changeEvent);
+		List<TextDocumentContentChangeEvent> changeEvents = Collections.singletonList(changeEvent);
 
 		// Send the notification with the computed changes and
-		// and the changed document's virtual file modification
+		//  the changed document's virtual file modification
 		// stamp as document version
 
 		didChange(
@@ -563,7 +563,7 @@ public final class AdaLSPServer {
 	 */
 	void didSave(@NotNull VirtualFile file) {
 
-		SaveOptions saveOptions = serverSyncPolicy.getSave();
+		SaveOptions saveOptions = serverSyncPolicy.getSave().getRight();
 
 		if (saveOptions == null ||
 			!AdaFileType.isAdaFile(file)) { return; }
@@ -625,7 +625,7 @@ public final class AdaLSPServer {
 		@NotNull Position position
 	) {
 
-		if (!driver.initialized() || capabilities.getCompletionProvider() == null) {
+		if (!driverService.initialized() || capabilities.getCompletionProvider() == null) {
 			return EMPTY_COMPLETION_ITEM_LIST;
 		}
 
@@ -647,13 +647,10 @@ public final class AdaLSPServer {
 
 	}
 
-	/**
-	 * @see org.eclipse.lsp4j.services.TextDocumentService#definition(TextDocumentPositionParams)
-	 */
 	@Nullable
 	public Location definition(@NotNull String documentUri, @NotNull Position position) {
 
-		if (!driver.initialized() || !capabilities.getDefinitionProvider()) {
+		if (!driverService.initialized() || !capabilities.getDefinitionProvider().getLeft()) {
 			return null;
 		}
 
@@ -661,8 +658,8 @@ public final class AdaLSPServer {
 			new TextDocumentIdentifier(documentUri), position);
 
 		List<? extends Location> locations =
-			documentRequest("textDocument/definition", documentUri,
-				() -> server.getTextDocumentService().definition(params));
+			Objects.requireNonNull(documentRequest("textDocument/definition", documentUri,
+				() -> server.getTextDocumentService().definition((DefinitionParams) params))).getLeft();
 
 		if (locations == null || locations.size() == 0) { return null; }
 
@@ -681,8 +678,7 @@ public final class AdaLSPServer {
 		         boolean  includeDefinition
 	) {
 
-		if (!driver.initialized() ||
-			!capabilities.getReferencesProvider())
+		if (!driverService.initialized() || !capabilities.getReferencesProvider().getLeft())
 		{ return EMPTY_LOCATION_LIST; }
 
 		final ReferenceParams params = new ReferenceParams();
@@ -709,8 +705,7 @@ public final class AdaLSPServer {
 	 */
 	public List<DocumentSymbol> documentSymbol(@NotNull String documentUri) {
 
-		if (!driver.initialized() ||
-			!capabilities.getDocumentSymbolProvider())
+		if (!driverService.initialized() || !capabilities.getDocumentSymbolProvider().getLeft())
 		{ return EMPTY_DOCUMENT_SYMBOL_LIST; }
 
 		final DocumentSymbolParams params = new DocumentSymbolParams(

@@ -1,11 +1,10 @@
 package com.adacore.adaintellij.analysis.syntactic.structure;
 
-import com.intellij.ide.structureView.*;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiFile;
+import com.intellij.ide.structureView.StructureViewBuilder;
 import com.intellij.lang.PsiStructureViewFactory;
 import com.intellij.psi.PsiFile;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.analysis.syntactic.AdaPsiFile;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Structure view factory for Ada files.

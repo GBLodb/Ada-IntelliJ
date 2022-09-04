@@ -1,9 +1,8 @@
 package com.adacore.adaintellij.project.template;
 
+import com.adacore.adaintellij.Utils;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.Utils;
 
 import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor.TemplateVariable;
 import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor.TemplateVariableWithOptions;
@@ -12,23 +11,6 @@ import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor
  * Parser of Ada project template descriptor files.
  */
 final class ProjectTemplateFileParser {
-
-	/**
-	 * Represents the various sections of a project template
-	 * descriptor file. Possible values are:
-	 *
-	 * HEADER      => The section of the template descriptor file
-	 *                containing information about the template
-	 *                such as the template name and category.
-	 *
-	 * VARIABLES   => The section of the template descriptor file
-	 *                containing template variable names along with
-	 *                their default values and descriptions.
-	 *
-	 * DESCRIPTION => The section of the template descriptor file
-	 *                containing a description of the template.
-	 */
-	private enum ParsingSection { HEADER , VARIABLES , DESCRIPTION }
 
 	/**
 	 * Reads and parses the template descriptor file in the given
@@ -83,7 +65,7 @@ final class ProjectTemplateFileParser {
 			new ProjectTemplateDescriptor.Builder(templateDirectory);
 
 		// Parse the template file and store the parsed data
-		// in the passed template descriptor builder
+		// in the past template descriptor builder
 
 		parseProjectTemplateFile(descriptorBuilder, templateFile);
 
@@ -217,7 +199,7 @@ final class ProjectTemplateFileParser {
 
 					// Ignore the "[Description]" line
 
-					if ("[description]".equals(line.toLowerCase())) { continue; }
+					if ("[description]".equalsIgnoreCase(line)) { continue; }
 
 					// If the description already contains text, then
 					// add a space before appending the next line
@@ -239,5 +221,22 @@ final class ProjectTemplateFileParser {
 		}
 
 	}
+
+	/**
+	 * Represents the various sections of a project template
+	 * descriptor file. Possible values are:
+	 * <p>
+	 * HEADER      => The section of the template descriptor file
+	 *                containing information about the template
+	 *                such as the template name and category.
+	 * <p>
+	 * VARIABLES   => The section of the template descriptor file
+	 *                containing template variable names along with
+	 *                their default values and descriptions.
+	 * <p>
+	 * DESCRIPTION => The section of the template descriptor file
+	 *                containing a description of the template.
+	 */
+	private enum ParsingSection { HEADER , VARIABLES , DESCRIPTION }
 
 }

@@ -1,12 +1,14 @@
 package com.adacore.adaintellij.analysis.semantic.usages;
 
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
+import com.adacore.adaintellij.analysis.syntactic.AdaPsiReference;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.refactoring.listeners.RefactoringElementListener;
 import com.intellij.refactoring.rename.RenamePsiElementProcessor;
 import com.intellij.usageView.UsageInfo;
-import org.jetbrains.annotations.*;
-
-import com.adacore.adaintellij.analysis.syntactic.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Processor of renaming operations over Ada PSI elements.
@@ -14,10 +16,10 @@ import com.adacore.adaintellij.analysis.syntactic.*;
 public class AdaRenamePsiElementProcessor extends RenamePsiElementProcessor {
 
 	/**
-	 * Returns whether or not the given element can be renamed.
+	 * Returns whether the given element can be renamed.
 	 *
 	 * @param element The element to test for rename support.
-	 * @return Whether or not the given element can be renamed.
+	 * @return Whether the given element can be renamed.
 	 */
 	public static boolean canRenameElement(@NotNull PsiElement element) {
 		return AdaPsiElement.getFrom(element) instanceof AdaPsiReference;
@@ -35,7 +37,7 @@ public class AdaRenamePsiElementProcessor extends RenamePsiElementProcessor {
 	 * Performs the actual process of renaming the given element
 	 * to the given name, as well as the given usages of that
 	 * element, and notifies the given refactoring listener.
-	 *
+	 * <p>
 	 * This method seems to be called with an empty array of usages
 	 * when the rename action is called from one of the usages,
 	 * instead of the declaration itself, so in that case we manually
@@ -68,10 +70,10 @@ public class AdaRenamePsiElementProcessor extends RenamePsiElementProcessor {
 		// Patch the element's usages in case they were not given
 
 		UsageInfo[] patchedUsages = usages.length > 0 ? usages :
-			findReferences(patchedElement)
-				.stream()
-				.map(reference -> createUsageInfo(patchedElement, reference, reference.getElement()))
-				.toArray(UsageInfo[]::new);
+				ReferencesSearch.search(patchedElement).findAll()
+						.stream()
+						.map(reference -> createUsageInfo(patchedElement, reference, reference.getElement()))
+						.toArray(UsageInfo[]::new);
 
 		// Perform the renaming
 

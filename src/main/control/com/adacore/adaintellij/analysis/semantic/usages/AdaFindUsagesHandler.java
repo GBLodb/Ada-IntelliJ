@@ -1,25 +1,31 @@
 package com.adacore.adaintellij.analysis.semantic.usages;
 
-import java.util.*;
-import java.util.stream.*;
-
-import com.intellij.find.findUsages.*;
+import com.adacore.adaintellij.lsp.AdaLSPDriverService;
+import com.adacore.adaintellij.lsp.AdaLSPServer;
+import com.intellij.find.findUsages.FindUsagesHandler;
+import com.intellij.find.findUsages.FindUsagesOptions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.usageView.UsageInfo;
 import com.intellij.util.Processor;
+import org.eclipse.lsp4j.Location;
 import org.jetbrains.annotations.NotNull;
 
-import org.eclipse.lsp4j.Location;
-
-import com.adacore.adaintellij.lsp.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.adacore.adaintellij.Utils.*;
-import static com.adacore.adaintellij.lsp.LSPUtils.*;
+import static com.adacore.adaintellij.lsp.LSPUtils.offsetToPosition;
+import static com.adacore.adaintellij.lsp.LSPUtils.positionToOffset;
 
 /**
  * Find-usages handler for Ada, powered by the
@@ -30,12 +36,12 @@ public final class AdaFindUsagesHandler extends FindUsagesHandler {
 	/**
 	 * The project in which this handler is used.
 	 */
-	private Project project;
+	private final Project project;
 
 	/**
 	 * Constructs a new AdaFindUsagesHandler given a PSI element.
 	 *
-	 * @param element The element to use to contruct the handler.
+	 * @param element The element to use to construct the handler.
 	 */
 	AdaFindUsagesHandler(@NotNull PsiElement element) {
 		super(element);
@@ -96,7 +102,7 @@ public final class AdaFindUsagesHandler extends FindUsagesHandler {
 	 * stream.
 	 *
 	 * @param target The target to which to find references.
-	 * @param includeDefinition Whether or not to include the target
+	 * @param includeDefinition Whether to include the target
 	 *                          element itself with the returned
 	 *                          references.
 	 */
@@ -114,7 +120,7 @@ public final class AdaFindUsagesHandler extends FindUsagesHandler {
 
 		// Make the request and wait for the result
 
-		AdaLSPServer lspServer = AdaLSPDriver.getServer(project);
+		AdaLSPServer lspServer = AdaLSPDriverService.getServer(project);
 
 		if (lspServer == null) { return Stream.empty(); }
 

@@ -1,9 +1,8 @@
 package com.adacore.adaintellij.project.module;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.*;
-
+import com.adacore.adaintellij.project.template.ProjectTemplateDescriptor;
+import com.adacore.adaintellij.project.template.ProjectTemplateManager;
+import com.adacore.adaintellij.wizard.AdaProjectWizardUI;
 import com.intellij.ide.util.projectWizard.*;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
@@ -11,9 +10,9 @@ import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import org.jetbrains.annotations.NotNull;
 
-import com.adacore.adaintellij.project.template.ProjectTemplateDescriptor;
-import com.adacore.adaintellij.project.template.ProjectTemplateManager;
-import com.adacore.adaintellij.wizard.AdaProjectWizardUI;
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.adacore.adaintellij.project.template.ProjectTemplateDescriptor.TemplateVariableSetting;
 
@@ -98,7 +97,7 @@ public final class AdaModuleBuilder extends ModuleBuilder {
 	 * @return This builder's module type.
 	 */
 	@Override
-	public ModuleType getModuleType() {
+	public ModuleType<?> getModuleType() {
 		return AdaModuleType.getInstance();
 	}
 

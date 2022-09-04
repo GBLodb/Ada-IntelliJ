@@ -1,12 +1,13 @@
 package com.adacore.adaintellij.analysis.syntactic.structure;
 
-import javax.swing.*;
-
-import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.*;
-import org.jetbrains.annotations.*;
-
 import com.adacore.adaintellij.analysis.syntactic.AdaPsiElement;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 /**
  * The presentation of an item in the structure view of an Ada file.
@@ -16,7 +17,7 @@ public final class AdaStructureItemPresentation implements ItemPresentation {
 	/**
 	 * The PSI element that this item presentation represents.
 	 */
-	private NavigatablePsiElement element;
+	private final NavigatablePsiElement element;
 
 	/**
 	 * Constructs a new AdaStructureItemPresentation given a

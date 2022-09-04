@@ -1,8 +1,6 @@
 package com.adacore.adaintellij.build;
 
-import java.awt.event.ItemEvent;
-import javax.swing.*;
-
+import com.adacore.adaintellij.AdaIntelliJUI;
 import com.intellij.execution.RunManagerListener;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -10,7 +8,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.adacore.adaintellij.AdaIntelliJUI;
+import javax.swing.*;
+import java.awt.event.ItemEvent;
 
 /**
  * Simple UI view with a combo-box containing GPRbuild configurations.
@@ -31,7 +30,7 @@ public final class GPRbuildConfigurationComboBoxView extends AdaIntelliJUI {
 	 * The GPRbuild configuration manager project component of this
 	 * view's project.
 	 */
-	private GPRbuildConfigurationManager gprbuildConfigurationManager;
+	private final GPRbuildConfigurationManagerService gprbuildConfigurationManagerService;
 
 	/**
 	 * Constructs a new GPRbuildConfigurationComboBoxView given a project.
@@ -58,20 +57,19 @@ public final class GPRbuildConfigurationComboBoxView extends AdaIntelliJUI {
 		// add a listener to update combo-box selected configuration
 		// on global configuration selection change
 
-		gprbuildConfigurationManager = GPRbuildConfigurationManager.getInstance(project);
+		gprbuildConfigurationManagerService = GPRbuildConfigurationManagerService.getInstance(project);
 
-		gprbuildConfigurationManager.addRunManagerListener(new RunManagerListener() {
+		gprbuildConfigurationManagerService.addRunManagerListener(new RunManagerListener() {
 
 			/**
 			 * Called when a different configuration is selected.
 			 */
 			@Override
-			public void runConfigurationSelected() {
+			public void runConfigurationSelected(RunnerAndConfigurationSettings settings) {
 
-				GPRbuildConfiguration configuration =
-					gprbuildConfigurationManager.getSelectedConfiguration();
+				GPRbuildConfiguration configuration = gprbuildConfigurationManagerService.getSelectedConfiguration();
 
-				if (configuration == null) { return; }
+				if (configuration == null) return;
 
 				comboBox.setSelectedItem(configuration);
 
@@ -116,7 +114,7 @@ public final class GPRbuildConfigurationComboBoxView extends AdaIntelliJUI {
 
 			if (itemEvent.getStateChange() != ItemEvent.SELECTED) { return; }
 
-			gprbuildConfigurationManager.setSelectedConfiguration(
+			gprbuildConfigurationManagerService.setSelectedConfiguration(
 				(GPRbuildConfiguration)itemEvent.getItem());
 
 		});
@@ -143,14 +141,14 @@ public final class GPRbuildConfigurationComboBoxView extends AdaIntelliJUI {
 
 		DefaultComboBoxModel<RunConfiguration> model = new DefaultComboBoxModel<>();
 
-		gprbuildConfigurationManager.getAllConfigurations().forEach(model::addElement);
+		gprbuildConfigurationManagerService.getAllConfigurations().forEach(model::addElement);
 
 		comboBox.setModel(model);
 
 		// Set selected configuration
 
 		GPRbuildConfiguration configuration =
-			gprbuildConfigurationManager.getSelectedConfiguration();
+			gprbuildConfigurationManagerService.getSelectedConfiguration();
 
 		if (configuration == null) { return; }
 

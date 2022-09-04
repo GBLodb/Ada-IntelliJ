@@ -1,6 +1,7 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Regex matching one or more occurrences of a sequence

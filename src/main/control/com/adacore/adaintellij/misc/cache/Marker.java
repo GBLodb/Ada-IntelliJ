@@ -1,6 +1,7 @@
 package com.adacore.adaintellij.misc.cache;
 
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Marker used to mark markables.

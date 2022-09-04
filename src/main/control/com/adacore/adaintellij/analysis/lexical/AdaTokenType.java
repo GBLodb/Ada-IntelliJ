@@ -1,11 +1,10 @@
 package com.adacore.adaintellij.analysis.lexical;
 
+import com.adacore.adaintellij.AdaLanguage;
 import com.intellij.lang.Language;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-
-import com.adacore.adaintellij.AdaLanguage;
 
 /**
  * Ada 2012 token type.

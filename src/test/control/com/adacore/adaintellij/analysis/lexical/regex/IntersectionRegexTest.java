@@ -2,9 +2,9 @@ package com.adacore.adaintellij.analysis.lexical.regex;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static com.adacore.adaintellij.analysis.lexical.regex.LexerRegexTestUtils.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * JUnit test class for the IntersectionRegex class.

@@ -1,13 +1,13 @@
 package com.adacore.adaintellij.build;
 
-import javax.swing.*;
-
-import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.ui.components.JBTextField;
-import org.jetbrains.annotations.*;
-
 import com.adacore.adaintellij.AdaIntelliJUI;
 import com.adacore.adaintellij.UIUtils;
+import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.ui.components.JBTextField;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 /**
  * Configuration editor UI for GPRbuild configurations.
@@ -28,7 +28,7 @@ public final class GPRbuildConfigurationEditor extends AdaIntelliJUI {
 	/**
 	 * External UI components.
 	 */
-	private ScenarioSettingsView scenarioSettingsView;
+	private final ScenarioSettingsView scenarioSettingsView;
 
 	/**
 	 * Constructs a new GPRbuildConfigurationEditor.
@@ -101,7 +101,7 @@ public final class GPRbuildConfigurationEditor extends AdaIntelliJUI {
 		// text fields is changed, but not when components are removed from the
 		// view, which is what happens when scenario variables are removed.
 		// The simplest solution to this problem seems to be this harmless little
-		// hack which consists in setting the the build arguments field to its
+		// hack which consists in setting the build arguments field to its
 		// own content.
 		buildArgumentsField.setText(buildArgumentsField.getText());
 

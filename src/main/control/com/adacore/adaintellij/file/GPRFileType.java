@@ -1,12 +1,13 @@
 package com.adacore.adaintellij.file;
 
-import javax.swing.*;
-
-import com.intellij.openapi.fileTypes.LanguageFileType;
-import org.jetbrains.annotations.*;
-
 import com.adacore.adaintellij.GPRLanguage;
 import com.adacore.adaintellij.Icons;
+import com.intellij.openapi.fileTypes.LanguageFileType;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 /**
  * Internal representation of the GNAT project file/GPR file type.

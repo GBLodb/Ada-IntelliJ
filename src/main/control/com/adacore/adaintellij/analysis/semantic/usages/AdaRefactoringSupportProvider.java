@@ -2,7 +2,8 @@ package com.adacore.adaintellij.analysis.semantic.usages;
 
 import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Refactoring support provider for Ada elements.
@@ -10,13 +11,13 @@ import org.jetbrains.annotations.*;
 public class AdaRefactoringSupportProvider extends RefactoringSupportProvider {
 
 	/**
-	 * Returns whether or not the given element, in the context of
+	 * Returns whether the given element, in the context of
 	 * the second given element, supports being renamed in-place by
 	 * a `MemberInplaceRenameHandler`.
 	 *
 	 * @param element The element to check for support.
 	 * @param context The context element.
-	 * @return Whether or not the element supports renaming by a
+	 * @return Whether the element supports renaming by a
 	 *         `MemberInplaceRenameHandler`.
 	 */
 	@Override

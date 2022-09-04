@@ -1,9 +1,8 @@
 package com.adacore.adaintellij.misc;
 
+import com.adacore.adaintellij.analysis.lexical.AdaTokenTypes;
 import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
-
-import com.adacore.adaintellij.analysis.lexical.AdaTokenTypes;
 
 /**
  * Ada code commenter.

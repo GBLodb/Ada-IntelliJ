@@ -1,13 +1,12 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import static com.adacore.adaintellij.analysis.lexical.regex.LexerRegexTestUtils.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * JUnit test class for the ConcatenationRegex class.

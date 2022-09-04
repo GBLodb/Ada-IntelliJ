@@ -1,9 +1,10 @@
 package com.adacore.adaintellij.analysis.lexical.regex;
 
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Regex matching zero or one occurrences of a sequence
+ * Regex matching zero or one occurrence of a sequence
  * of characters matched by a subregex.
  */
 public final class ZeroOrOneRegex extends LexerRegex {

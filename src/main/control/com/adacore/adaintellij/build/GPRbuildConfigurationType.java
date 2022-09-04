@@ -1,11 +1,10 @@
 package com.adacore.adaintellij.build;
 
-import javax.swing.*;
-
+import com.adacore.adaintellij.Icons;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 
-import com.adacore.adaintellij.Icons;
+import javax.swing.*;
 
 /**
  * Run configuration type for GPRbuild run configurations.
